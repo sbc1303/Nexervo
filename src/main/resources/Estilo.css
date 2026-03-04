@@ -1,26 +1,19 @@
-/*
-Hoja de estilos principal para la aplicación de Reservas.
- */
-
 /* Configuración del contenedor raíz */
 .root {
-    /* Degradado lineal para dar un aspecto moderno a la aplicación */
     -fx-background-color: linear-gradient(to bottom right, #310e68 10%, #162252 50%, #0f4c75 90%);
     -fx-font-family: "Helvetica Neue", Arial, sans-serif;
 }
 
-/* --- Etiquetas--- */
 .label {
     -fx-text-fill: white;
     -fx-font-size: 14px;
     -fx-font-weight: bold;
-    /* Sombra suave para mejorar la legibilidad sobre el fondo oscuro */
     -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.6), 3, 0, 1, 1);
 }
 
-/* --- Campos del formulario --- */
+/* Campos de entrada */
 .text-field, .spinner, .date-picker .text-field, .combo-box {
-    -fx-background-color: rgba(20, 20, 30, 0.6); /* Fondo semitransparente */
+    -fx-background-color: rgba(20, 20, 30, 0.6);
     -fx-text-fill: white;
     -fx-prompt-text-fill: #8888AA;
     -fx-background-radius: 5;
@@ -28,85 +21,52 @@ Hoja de estilos principal para la aplicación de Reservas.
     -fx-border-radius: 5;
 }
 
-/* Estado de foco: Resalta el campo que está editando el usuario */
-.text-field:focused, .spinner:focused, .date-picker .text-field:focused, .combo-box:focused {
-     -fx-border-color: #00C6FF;
-     /* Efecto de resplandor (glow) azul cian */
-     -fx-effect: dropshadow(three-pass-box, rgba(0,198,255,0.4), 10, 0, 0, 0);
+/* COMBOBOX: Solución para el fondo blanco */
+.combo-box .list-cell {
+    -fx-text-fill: white;
 }
-
-/* Personalización del ComboBox desplegado */
-.combo-box .list-cell { -fx-text-fill: white; }
 
 .combo-box-popup .list-view {
     -fx-background-color: #051937;
-    -fx-border-color: #5D3FD3;
+    -fx-border-color: #00C6FF;
 }
 
-.combo-box-popup .list-cell { -fx-text-fill: white; }
-
-.combo-box-popup .list-cell:filled:selected,
-.combo-box-popup .list-cell:filled:hover {
-    -fx-background-color: #5D3FD3; /* Color al pasar el ratón por las opciones */
+.combo-box-popup .list-cell {
+    -fx-background-color: #051937;
+    -fx-text-fill: white;
 }
 
-/* --- Botones de acción--- */
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: #5D3FD3;
+}
 
-/* Botón principal (Confirmar) con degradado propio */
+/* Botones */
 .boton-confirmar {
     -fx-background-color: linear-gradient(to right, #6a11cb, #2575fc);
     -fx-text-fill: white;
     -fx-font-weight: bold;
-    -fx-background-radius: 20; /* Bordes muy redondeados */
-    -fx-cursor: hand;
-    -fx-effect: dropshadow(three-pass-box, rgba(106, 17, 203, 0.4), 10, 0, 0, 0);
+    -fx-background-radius: 20;
 }
 
-/* Efecto hover: el botón crece ligeramente y cambia el tono */
 .boton-confirmar:hover {
-    -fx-background-color: linear-gradient(to right, #7b22dc, #3686ff);
     -fx-scale-x: 1.05;
     -fx-scale-y: 1.05;
 }
 
-/* Botón secundario (Limpiar) estilo "outline" */
 .boton-secundario {
     -fx-background-color: transparent;
     -fx-border-color: #666688;
     -fx-border-radius: 20;
     -fx-text-fill: #AAAAAA;
-    -fx-font-weight: bold;
-    -fx-cursor: hand;
 }
 
-.boton-secundario:hover {
-    -fx-border-color: white;
-    -fx-text-fill: white;
-}
-
-/* --- Mapa de mesas --- */
-
-/* Estilo base compartido por todas las mesas */
+/* Mesas */
 .mesa-base {
     -fx-background-radius: 8;
     -fx-font-weight: bold;
     -fx-text-fill: white;
-    -fx-cursor: hand;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 5, 0, 2, 2);
 }
 
-/* Semáforo de colores */
-.mesa-libre {
-    -fx-background-color: #00E676; /* Verde */
-    -fx-text-fill: #051937;
-}
-
-.mesa-ocupada {
-    -fx-background-color: #FF3366; /* Rojo */
-    -fx-text-fill: white;
-}
-
-.mesa-reservada {
-    -fx-background-color: #FFC107; /* Amarillo */
-    -fx-text-fill: #051937;
-}
+.mesa-libre { -fx-background-color: #00E676; -fx-text-fill: #051937; }
+.mesa-ocupada { -fx-background-color: #FF3366; }
+.mesa-reservada { -fx-background-color: #FFC107; -fx-text-fill: #051937; }
