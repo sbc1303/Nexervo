@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+
+<AnchorPane prefHeight="600.0" prefWidth="900.0" styleClass="root" stylesheets="@Estilo.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.nexervo.controlador.ReservaControlador">
+   <children>
+
+      <ImageView fitHeight="150.0" fitWidth="300.0" layoutX="300.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="300.0" AnchorPane.rightAnchor="300.0" AnchorPane.topAnchor="10.0">
+         <image>
+            <Image url="@Logo%20NEXERVO%20sin%20fondo.png" />
+         </image>
+      </ImageView>
+
+      <HBox alignment="CENTER_RIGHT" layoutX="700.0" layoutY="20.0" spacing="10.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="30.0">
+         <children>
+            <Label style="-fx-text-fill: #AAAAAA;" text="Camarero: Juan P." />
+            <Circle fill="#00c6ff" radius="6.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" />
+         </children>
+      </HBox>
+
+      <VBox layoutX="80.0" layoutY="140.0" prefWidth="300.0" spacing="10.0" AnchorPane.leftAnchor="80.0" AnchorPane.topAnchor="140.0">
+         <children>
+            <Label text="Nombre Cliente:" />
+            <TextField fx:id="txtNombre" promptText="Ej. Santiago Bermejo" />
+
+            <Label text="Teléfono:" />
+            <TextField fx:id="txtTelefono" promptText="600 000 000" />
+
+            <Label text="Nº Comensales:" />
+            <Spinner fx:id="spinnerComensales" editable="true" maxWidth="1.7976931348623157E308" />
+
+            <Label text="Fecha Reserva:" />
+            <DatePicker fx:id="fechaReserva" maxWidth="1.7976931348623157E308" promptText="Seleccionar fecha" />
+
+            <Label text="Hora Reserva:" />
+            <ComboBox fx:id="comboHora" maxWidth="1.7976931348623157E308" promptText="Seleccionar hora..." />
+
+            <Label text="Alergias / Intolerancias:" />
+            <ComboBox fx:id="comboAlergias" editable="true" maxWidth="1.7976931348623157E308" promptText="Escriba o seleccione..." />
+
+            <HBox alignment="CENTER_LEFT" spacing="20.0">
+               <children>
+                  <Button fx:id="btnConfirmar" mnemonicParsing="false" onAction="#onConfirmarClick" prefHeight="40.0" prefWidth="140.0" styleClass="boton-confirmar" text="CONFIRMAR" />
+
+                  <Button fx:id="btnLimpiar" mnemonicParsing="false" onAction="#onLimpiarClick" prefHeight="35.0" prefWidth="100.0" styleClass="boton-secundario" text="LIMPIAR" />
+               </children>
+               <VBox.margin>
+                  <Insets top="15.0" />
+               </VBox.margin>
+            </HBox>
+         </children>
+      </VBox>
+
+      <VBox alignment="TOP_CENTER" layoutX="466.0" layoutY="150.0" spacing="15.0" AnchorPane.rightAnchor="80.0" AnchorPane.topAnchor="150.0">
+         <children>
+            <Label style="-fx-font-size: 16px; -fx-text-fill: #00C6FF;" text="MAPA DE SALA" />
+
+            <HBox spacing="15.0">
+               <children>
+                  <Button prefHeight="70.0" prefWidth="80.0" styleClass="mesa-base, mesa-libre" text="MESA 1" />
+                  <Button prefHeight="70.0" prefWidth="80.0" styleClass="mesa-base, mesa-ocupada" text="MESA 2" />
+                  <Button prefHeight="70.0" prefWidth="80.0" styleClass="mesa-base, mesa-libre" text="MESA 3" />
+               </children>
+            </HBox>
+
+            <HBox spacing="15.0">
+               <children>
+                  <Button prefHeight="70.0" prefWidth="80.0" styleClass="mesa-base, mesa-reservada" text="MESA 4" />
+                  <Button prefHeight="70.0" prefWidth="80.0" styleClass="mesa-base, mesa-libre" text="MESA 5" />
+                  <Button prefHeight="70.0" prefWidth="80.0" styleClass="mesa-base, mesa-libre" text="MESA 6" />
+               </children>
+            </HBox>
+
+            <HBox spacing="15.0">
+               <children>
+                  <Button prefHeight="70.0" prefWidth="80.0" styleClass="mesa-base, mesa-ocupada" text="MESA 7" />
+                  <Button prefHeight="70.0" prefWidth="80.0" styleClass="mesa-base, mesa-ocupada" text="MESA 8" />
+                  <Button prefHeight="70.0" prefWidth="80.0" styleClass="mesa-base, mesa-libre" text="MESA 9" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+
+   </children>
+</AnchorPane>
