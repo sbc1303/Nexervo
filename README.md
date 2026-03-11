@@ -27,6 +27,12 @@ A partir de esta base, el proyecto continúa en evolución con nuevas mejoras or
 
 ## Tecnologías del proyecto
 
+- Java 21
+- JavaFX
+- Maven
+- MySQL
+- Docker
+
 ### Implementadas actualmente
 
 - Java
@@ -91,7 +97,6 @@ A medida que avance el desarrollo, se plantea incorporar o mejorar aspectos como
 - Gestión más avanzada de clientes y reservas
 
 ---
-
 ## Estado del proyecto
 
 Nexervo se encuentra actualmente en fase de desarrollo y evolución como proyecto de fin de ciclo.
