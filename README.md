@@ -1,102 +1,280 @@
-# Nexervo - Sistema de gestión de reservas para hostelería
-
-Nexervo es una aplicación orientada a la gestión de reservas en negocios de hostelería.
-
-El proyecto nace a partir de mi experiencia profesional en el sector, donde he podido conocer de cerca la importancia de una buena organización de reservas, clientes y disponibilidad. La finalidad de Nexervo es desarrollar una solución que permita centralizar esta gestión de una forma clara, práctica y escalable.
-
-Este proyecto está planteado como mi **proyecto de fin de CFGS de Desarrollo de Aplicaciones Multiplataforma (DAM)**, por lo que su desarrollo está enfocado tanto a resolver una necesidad real como a aplicar conocimientos de programación, bases de datos y organización de aplicaciones.
+🇪🇸 [Español](#gestor-de-tareas---api-rest-con-fastapi) | 🇬🇧 [English](#task-manager---rest-api-with-fastapi)
 
 ---
 
-## Objetivo del proyecto
+# Gestor de Tareas - API REST con FastAPI
 
-El objetivo principal de Nexervo es crear una aplicación que permita gestionar de forma eficiente las reservas de un establecimiento de hostelería, facilitando el control de clientes, disponibilidad y organización interna.
+Este proyecto consiste en el desarrollo de una **API REST con FastAPI** para gestionar una lista de tareas.
+Los datos se almacenan en un **archivo JSON local**, sin utilizar una base de datos.
 
----
+Para el desarrollo del proyecto se plantearon inicialmente unos **endpoints básicos**, pero durante la implementación surgieron varias ideas que aportaban valor al proyecto:
 
-## Estado actual del proyecto
+- Borrado lógico
+- Búsqueda avanzada por diferentes campos
+- Organización de endpoints por categorías
+- Sistema de logging
+- Escritura segura del JSON con backup
 
-Actualmente el repositorio contiene una primera base del proyecto desarrollada en:
+## Tecnologías
 
-- Java
-- Maven
+| Herramienta | Versión | Función |
+|-------------|---------|---------|
+| Python | 3.11 | Lenguaje principal |
+| FastAPI | latest | Framework para la API REST |
+| Pydantic | v2 | Validación de datos y modelos |
+| Uvicorn | latest | Servidor ASGI |
+| Docker | latest | Contenedor para despliegue |
 
-A partir de esta base, el proyecto continúa en evolución con nuevas mejoras orientadas a ampliar su funcionalidad y hacerlo más sólido a nivel técnico.
+## Requisitos del sistema
 
----
+- Python 3.11 o superior
+- Docker (opcional, para ejecución en contenedor)
+- 512 MB de RAM mínimo
 
-## Tecnologías del proyecto
+## Instalación y ejecución
 
-- Java 21
-- JavaFX
-- Maven
-- MySQL
-- Docker
+### Ejecutar en local
+```bash
+pip install -r requirements.txt
+uvicorn main:app --reload
+```
 
-### Implementadas actualmente
+La API estará disponible en `http://localhost:8000`
+La documentación interactiva (Swagger) en `http://localhost:8000/docs`
 
-- Java
-- Maven
+### Ejecutar con Docker
+```bash
+docker build -t gestor-tareas .
+docker run -d -p 8000:8000 gestor-tareas
+```
 
-### En desarrollo / mejora
+## Interfaz Swagger
 
-- MySQL
-- Persistencia de datos
-- Mejoras en la estructura del proyecto
-- Nuevas funcionalidades relacionadas con la gestión de reservas
+La API incluye documentación automática generada por FastAPI mediante Swagger, donde se pueden probar todos los endpoints directamente desde el navegador.
 
----
-
-## Funcionalidades previstas
-
-Entre las funcionalidades principales del proyecto se encuentran:
-
-- Registro de reservas
-- Consulta de reservas existentes
-- Gestión de clientes
-- Organización de la disponibilidad
-- Control estructurado de la información
-- Persistencia de datos mediante base de datos
-
----
-
-## Enfoque del desarrollo
-
-Nexervo está siendo desarrollado como una aplicación con recorrido, pensada para evolucionar progresivamente hacia una solución más completa.
-
-Además del apartado funcional, el proyecto también busca aplicar buenas prácticas de desarrollo, organización y claridad en el código, modelado de datos y diseño de una solución orientada a un caso de uso real.
-
----
+![Swagger](docs/Swagger.png)
 
 ## Estructura del proyecto
-
-El proyecto sigue una estructura basada en Maven:
-
 ```
-Nexervo/
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   └── resources/
-│   └── test/
-├── pom.xml
-└── README.md
+Proyecto-ToDo-fastapi/
+├── main.py          # Endpoints organizados por categorías
+├── models.py        # Modelos Pydantic, Enum y validaciones
+├── database.py      # Lectura y escritura del JSON + sistema de backup
+├── requirements.txt
+├── Dockerfile
+├── .dockerignore
+└── database.json    # Se genera automáticamente al crear la primera tarea
 ```
+
+## Endpoints disponibles
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| POST | /tasks | Crear una tarea nueva |
+| GET | /tasks | Listar todas las tareas activas |
+| GET | /tasks?ver_papelera=true | Ver tareas eliminadas |
+| GET | /tasks?ordenar_por=prioridad | Ordenar por prioridad, fecha o vencimiento |
+| GET | /tasks/busqueda | Buscar por id, título, prioridad o fechas |
+| PATCH | /tasks/{id} | Editar título y/o descripción |
+| PATCH | /tasks/{id}/estado | Cambiar el estado de una tarea |
+| DELETE | /tasks/{id} | Mover una tarea a la papelera |
+| PATCH | /tasks/{id}/restaurar | Restaurar una tarea desde la papelera |
+| DELETE | /tasks/papelera/vaciar | Vaciar la papelera definitivamente |
+| GET | /dashboard | Ver estadísticas generales |
+
+## Funcionalidades destacadas
+
+**Borrado lógico** — Las tareas eliminadas no se borran del JSON, se marcan como inactivas para poder restaurarlas.
+
+**Búsqueda flexible** — Permite buscar tareas por ID, título, prioridad o fechas.
+
+**Ordenación del listado** — Las tareas pueden ordenarse por prioridad, fecha de creación o fecha de vencimiento.
+
+**Validación de fechas** — La fecha de vencimiento solo acepta el formato `DD-MM-YYYY`. Si el formato no es correcto, la API devuelve un error.
+
+**Estado como Enum** — Los estados posibles son `Pendiente`, `En proceso` y `Completada`, definidos como Enum para evitar valores incorrectos.
+
+**Panel de estadísticas** — El endpoint `/dashboard` muestra el total de tareas y su distribución por estado.
+
+**Logging** — Cada lectura o escritura del JSON queda registrada en consola. Si el archivo está corrupto, el sistema lo restaura desde un backup.
+
+**Escritura segura** — Antes de sobrescribir el JSON se genera una copia de seguridad y se usa un archivo temporal para evitar corrupción.
+
+## Ejemplos de uso
+```
+POST /tasks
+```
+```json
+{
+  "titulo": "Estudiar para el examen",
+  "prioridad": "Alta",
+  "etiquetas": ["Estudio"],
+  "fecha_vencimiento": "01-03-2025"
+}
+```
+```
+PATCH /tasks/1/estado
+```
+```json
+{
+  "nuevo_estado": "Completada"
+}
+```
+```
+GET /tasks/busqueda?titulo=examen
+GET /tasks?ordenar_por=prioridad
+DELETE /tasks/1
+GET /tasks?ver_papelera=true
+PATCH /tasks/1/restaurar
+DELETE /tasks/papelera/vaciar
+```
+
+## Solución de problemas frecuentes
+
+**La API no arranca en local**
+Verificar que el entorno virtual está activado y que las dependencias están instaladas con `pip install -r requirements.txt`.
+
+**El archivo JSON aparece corrupto**
+El sistema de backup debería restaurarlo automáticamente. Si no es así, eliminar `database.json` y `database.json.bak` y reiniciar la API.
+
+**Docker no encuentra el puerto**
+Verificar que el puerto 8000 no está siendo usado por otra aplicación antes de ejecutar el contenedor.
 
 ---
 
-## Líneas de evolución del proyecto
+# Task Manager - REST API with FastAPI
 
-A medida que avance el desarrollo, se plantea incorporar o mejorar aspectos como:
+A **REST API built with FastAPI** for managing a task list. Data is stored in a **local JSON file** with no database required.
 
-- Integración completa con MySQL
-- Gestión de mesas y disponibilidad
-- Validaciones y control de errores
-- Interfaz gráfica o interfaz web
-- Panel de administración
-- Gestión más avanzada de clientes y reservas
+The project started with basic endpoints and evolved to include additional features that add real value:
 
----
-## Estado del proyecto
+- Soft delete
+- Advanced search across multiple fields
+- Endpoints organised by category
+- Logging system
+- Safe JSON writing with backup
 
-Nexervo se encuentra actualmente en fase de desarrollo y evolución como proyecto de fin de ciclo.
+## Technologies
+
+| Tool | Version | Purpose |
+|------|---------|---------|
+| Python | 3.11 | Main language |
+| FastAPI | latest | REST API framework |
+| Pydantic | v2 | Data validation and models |
+| Uvicorn | latest | ASGI server |
+| Docker | latest | Deployment container |
+
+## System Requirements
+
+- Python 3.11 or higher
+- Docker (optional, for container execution)
+- 512 MB RAM minimum
+
+## Installation and Usage
+
+### Run locally
+```bash
+pip install -r requirements.txt
+uvicorn main:app --reload
+```
+
+API available at `http://localhost:8000`
+Interactive documentation (Swagger) at `http://localhost:8000/docs`
+
+### Run with Docker
+```bash
+docker build -t gestor-tareas .
+docker run -d -p 8000:8000 gestor-tareas
+```
+
+## Swagger Interface
+
+The API includes automatic documentation generated by FastAPI via Swagger, where all endpoints can be tested directly from the browser.
+
+![Swagger](docs/Swagger.png)
+
+## Project Structure
+```
+Proyecto-ToDo-fastapi/
+├── main.py          # Endpoints organised by category
+├── models.py        # Pydantic models, Enum and validations
+├── database.py      # JSON read/write + backup system
+├── requirements.txt
+├── Dockerfile
+├── .dockerignore
+└── database.json    # Generated automatically on first task creation
+```
+
+## Available Endpoints
+
+| Method | Route | Description |
+|--------|-------|-------------|
+| POST | /tasks | Create a new task |
+| GET | /tasks | List all active tasks |
+| GET | /tasks?ver_papelera=true | View deleted tasks |
+| GET | /tasks?ordenar_por=prioridad | Sort by priority, date or due date |
+| GET | /tasks/busqueda | Search by id, title, priority or dates |
+| PATCH | /tasks/{id} | Edit title and/or description |
+| PATCH | /tasks/{id}/estado | Change task status |
+| DELETE | /tasks/{id} | Move task to bin |
+| PATCH | /tasks/{id}/restaurar | Restore task from bin |
+| DELETE | /tasks/papelera/vaciar | Empty bin permanently |
+| GET | /dashboard | View general statistics |
+
+## Key Features
+
+**Soft delete** — Deleted tasks are marked as inactive in the JSON, not permanently removed, allowing restoration.
+
+**Flexible search** — Search tasks by ID, title, priority or dates.
+
+**List sorting** — Tasks can be sorted by priority, creation date or due date.
+
+**Date validation** — Due date only accepts `DD-MM-YYYY` format. Incorrect format returns an error.
+
+**Enum status** — Possible states are `Pendiente`, `En proceso` and `Completada`, defined as Enum to prevent incorrect values.
+
+**Statistics dashboard** — The `/dashboard` endpoint shows total tasks and their distribution by status.
+
+**Logging** — Every JSON read or write is logged to console. If the file is corrupted, the system restores it from backup.
+
+**Safe writing** — Before overwriting the JSON, a backup copy is created and a temporary file is used to prevent corruption.
+
+## Usage Examples
+```
+POST /tasks
+```
+```json
+{
+  "titulo": "Estudiar para el examen",
+  "prioridad": "Alta",
+  "etiquetas": ["Estudio"],
+  "fecha_vencimiento": "01-03-2025"
+}
+```
+```
+PATCH /tasks/1/estado
+```
+```json
+{
+  "nuevo_estado": "Completada"
+}
+```
+```
+GET /tasks/busqueda?titulo=examen
+GET /tasks?ordenar_por=prioridad
+DELETE /tasks/1
+GET /tasks?ver_papelera=true
+PATCH /tasks/1/restaurar
+DELETE /tasks/papelera/vaciar
+```
+
+## Troubleshooting
+
+**API does not start locally**
+Make sure the virtual environment is activated and dependencies are installed with `pip install -r requirements.txt`.
+
+**JSON file appears corrupted**
+The backup system should restore it automatically. If not, delete `database.json` and `database.json.bak` and restart the API.
+
+**Docker cannot find the port**
+Check that port 8000 is not already in use before running the container.
