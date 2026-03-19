@@ -3,7 +3,6 @@ package com.nexervo.controlador;
 import datos.ClienteDAO;
 import datos.ReservaDAO;
 import modelo.Cliente;
-import modelo.Reserva;
 import modelo.ReservaView;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;

@@ -1,91 +1,201 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
 
-<AnchorPane prefHeight="760.0" prefWidth="1080.0" styleClass="root"
-            stylesheets="@Estilo.css"
-            xmlns="http://javafx.com/javafx/21"
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
+            prefHeight="760.0"
+            prefWidth="1080.0"
+            styleClass="root"
+            stylesheets="@Estilo.css"
             fx:controller="com.nexervo.controlador.ReservaControlador">
+
    <children>
-      <ImageView fitHeight="90.0" fitWidth="220.0" layoutX="430.0" layoutY="10.0"
-                 pickOnBounds="true" preserveRatio="true">
-         <image><Image url="@Logo%20NEXERVO%20sin%20fondo.png" /></image>
+
+      <ImageView fitHeight="90.0"
+                 fitWidth="220.0"
+                 layoutX="430.0"
+                 layoutY="10.0"
+                 pickOnBounds="true"
+                 preserveRatio="true">
+         <image>
+            <Image url="@Logo%20NEXERVO%20sin%20fondo.png" />
+         </image>
       </ImageView>
 
       <HBox layoutX="790.0" layoutY="22.0" spacing="10.0">
-         <Button text="Reservas" onAction="#onVerReservas" styleClass="boton-nav" prefWidth="120" prefHeight="35" />
-         <Button text="Clientes"  onAction="#onVerClientes"  styleClass="boton-nav" prefWidth="120" prefHeight="35" />
+         <children>
+            <Button text="Reservas"
+                    onAction="#onVerReservas"
+                    styleClass="boton-nav"
+                    prefWidth="120.0"
+                    prefHeight="35.0" />
+            <Button text="Clientes"
+                    onAction="#onVerClientes"
+                    styleClass="boton-nav"
+                    prefWidth="120.0"
+                    prefHeight="35.0" />
+         </children>
       </HBox>
 
       <VBox layoutX="30.0" layoutY="115.0" prefWidth="470.0" spacing="10.0">
          <children>
-            <Label text="NUEVA RESERVA" style="-fx-font-size:18px; -fx-text-fill:#00C6FF;" />
+            <Label text="NUEVA RESERVA"
+                   style="-fx-font-size:18px; -fx-text-fill:#00C6FF;" />
+
             <HBox spacing="10.0">
-               <VBox HBox.hgrow="ALWAYS"><Label text="Nombre *" /><TextField fx:id="txtNombre" promptText="Nombre..." /></VBox>
-               <VBox HBox.hgrow="ALWAYS"><Label text="Apellidos *" /><TextField fx:id="txtApellidos" promptText="Apellidos..." /></VBox>
+               <children>
+                  <VBox HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label text="Nombre *" />
+                        <TextField fx:id="txtNombre" promptText="Nombre..." />
+                     </children>
+                  </VBox>
+
+                  <VBox HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label text="Apellidos *" />
+                        <TextField fx:id="txtApellidos" promptText="Apellidos..." />
+                     </children>
+                  </VBox>
+               </children>
             </HBox>
+
             <HBox spacing="10.0">
-               <VBox HBox.hgrow="ALWAYS"><Label text="Telefono *" /><TextField fx:id="txtTelefono" promptText="600000000" /></VBox>
-               <VBox HBox.hgrow="ALWAYS"><Label text="Email" /><TextField fx:id="txtEmail" promptText="correo@ejemplo.com" /></VBox>
+               <children>
+                  <VBox HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label text="Telefono *" />
+                        <TextField fx:id="txtTelefono" promptText="600000000" />
+                     </children>
+                  </VBox>
+
+                  <VBox HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label text="Email" />
+                        <TextField fx:id="txtEmail" promptText="correo@ejemplo.com" />
+                     </children>
+                  </VBox>
+               </children>
             </HBox>
+
             <HBox spacing="10.0">
-               <VBox HBox.hgrow="ALWAYS"><Label text="Comensales *" /><Spinner fx:id="spinnerComensales" editable="true" maxWidth="Infinity" /></VBox>
-               <VBox HBox.hgrow="ALWAYS"><Label text="Fecha Reserva *" /><DatePicker fx:id="fechaReserva" maxWidth="Infinity" /></VBox>
+               <children>
+                  <VBox HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label text="Comensales *" />
+                        <Spinner fx:id="spinnerComensales" editable="true" maxWidth="Infinity" />
+                     </children>
+                  </VBox>
+
+                  <VBox HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label text="Fecha Reserva *" />
+                        <DatePicker fx:id="fechaReserva" maxWidth="Infinity" />
+                     </children>
+                  </VBox>
+               </children>
             </HBox>
+
             <Label text="Turno y Hora *" />
-            <ComboBox fx:id="comboHora" maxWidth="Infinity" promptText="Selecciona fecha primero..." />
+            <javafx.scene.control.ComboBox fx:id="comboHora"
+                                           maxWidth="Infinity"
+                                           promptText="Selecciona fecha primero..." />
+
             <Label text="Mesa Seleccionada *" />
-            <TextField fx:id="txtMesaSeleccionada" editable="false"
+            <TextField fx:id="txtMesaSeleccionada"
+                       editable="false"
                        promptText="Selecciona una mesa del mapa"
                        style="-fx-text-fill: #00C6FF; -fx-font-weight: bold;" />
-            <Label text="Alergenos e Intolerancias (seleccion multiple):" />
+
+            <Label text="Alergenos e Intolerancias (selección múltiple):" />
             <ListView fx:id="listaAlergias" prefHeight="110.0" />
-            <Label fx:id="lblSeleccionadas" text="Ninguna seleccionada"
+
+            <Label fx:id="lblSeleccionadas"
+                   text="Ninguna seleccionada"
                    style="-fx-text-fill:#FFC107; -fx-font-size:11px;" />
+
             <Label text="Preferencias / Observaciones:" />
-            <TextArea fx:id="txtObservaciones" prefHeight="60.0" wrapText="true"
-                      promptText="Mesa especial, ocasion, preferencias..." />
+            <TextArea fx:id="txtObservaciones"
+                      prefHeight="60.0"
+                      wrapText="true"
+                      promptText="Mesa especial, ocasión, preferencias..." />
+
             <HBox alignment="CENTER" spacing="15.0">
-               <padding><Insets top="5"/></padding>
-               <Button onAction="#onConfirmarClick" prefHeight="45.0" prefWidth="210.0"
-                       styleClass="boton-confirmar" text="CONFIRMAR RESERVA" />
-               <Button onAction="#onLimpiarClick" prefHeight="45.0" prefWidth="110.0"
-                       styleClass="boton-secundario" text="LIMPIAR" />
+               <padding>
+                  <Insets top="5.0" />
+               </padding>
+               <children>
+                  <Button text="CONFIRMAR RESERVA"
+                          onAction="#onConfirmarClick"
+                          prefHeight="45.0"
+                          prefWidth="210.0"
+                          styleClass="boton-confirmar" />
+                  <Button text="LIMPIAR"
+                          onAction="#onLimpiarClick"
+                          prefHeight="45.0"
+                          prefWidth="110.0"
+                          styleClass="boton-secundario" />
+               </children>
             </HBox>
          </children>
       </VBox>
 
-      <VBox alignment="TOP_CENTER" layoutX="545.0" layoutY="115.0"
-            AnchorPane.rightAnchor="20.0" spacing="12.0">
+      <VBox alignment="TOP_CENTER"
+            layoutX="545.0"
+            layoutY="115.0"
+            spacing="12.0"
+            AnchorPane.rightAnchor="20.0">
          <children>
-            <Label text="SALA" style="-fx-font-size:20px; -fx-text-fill:#00C6FF; -fx-font-weight:bold;" />
+            <Label text="SALA"
+                   style="-fx-font-size:20px; -fx-text-fill:#00C6FF; -fx-font-weight:bold;" />
+
             <Label text="Selecciona fecha y turno para ver disponibilidad"
                    style="-fx-font-size:11px; -fx-text-fill:#888888;" />
+
             <HBox spacing="18.0" alignment="CENTER">
-               <Label text="LIBRE"   style="-fx-text-fill:#00E676; -fx-font-weight:bold;" />
-               <Label text="OCUPADA" style="-fx-text-fill:#FF3366; -fx-font-weight:bold;" />
-               <Label text="ELEGIDA" style="-fx-text-fill:#FFC107; -fx-font-weight:bold;" />
-            </HBox>
-            <GridPane fx:id="gridMapa" hgap="12.0" vgap="12.0" visible="false" alignment="CENTER">
                <children>
-                  <Button prefHeight="70.0" prefWidth="100.0" styleClass="mesa-base" text="M1" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                  <Button prefHeight="70.0" prefWidth="100.0" styleClass="mesa-base" text="M2" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                  <Button prefHeight="70.0" prefWidth="100.0" styleClass="mesa-base" text="M3" GridPane.columnIndex="2" GridPane.rowIndex="0" />
-                  <Button prefHeight="70.0" prefWidth="100.0" styleClass="mesa-base" text="M4" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                  <Button prefHeight="70.0" prefWidth="100.0" styleClass="mesa-base" text="M5" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <Button prefHeight="70.0" prefWidth="100.0" styleClass="mesa-base" text="M6" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                  <Button prefHeight="70.0" prefWidth="100.0" styleClass="mesa-base" text="M7" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                  <Button prefHeight="70.0" prefWidth="100.0" styleClass="mesa-base" text="M8" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                  <Button prefHeight="70.0" prefWidth="100.0" styleClass="mesa-base" text="M9" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                  <Label text="LIBRE" style="-fx-text-fill:#00E676; -fx-font-weight:bold;" />
+                  <Label text="OCUPADA" style="-fx-text-fill:#FF3366; -fx-font-weight:bold;" />
+                  <Label text="ELEGIDA" style="-fx-text-fill:#FFC107; -fx-font-weight:bold;" />
                </children>
-                        <Button prefHeight="70.0" prefWidth="100.0" styleClass="mesa-base" text="M10" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-            <Button prefHeight="70.0" prefWidth="100.0" styleClass="mesa-base" text="M11" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-            <Button prefHeight="70.0" prefWidth="100.0" styleClass="mesa-base" text="M12" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-         </GridPane>
+            </HBox>
+
+            <GridPane fx:id="gridMapa"
+                      hgap="12.0"
+                      vgap="12.0"
+                      visible="false"
+                      alignment="CENTER">
+               <children>
+                  <Button text="M1" prefHeight="70.0" prefWidth="100.0" styleClass="mesa-base" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                  <Button text="M2" prefHeight="70.0" prefWidth="100.0" styleClass="mesa-base" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                  <Button text="M3" prefHeight="70.0" prefWidth="100.0" styleClass="mesa-base" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                  <Button text="M4" prefHeight="70.0" prefWidth="100.0" styleClass="mesa-base" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                  <Button text="M5" prefHeight="70.0" prefWidth="100.0" styleClass="mesa-base" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Button text="M6" prefHeight="70.0" prefWidth="100.0" styleClass="mesa-base" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                  <Button text="M7" prefHeight="70.0" prefWidth="100.0" styleClass="mesa-base" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                  <Button text="M8" prefHeight="70.0" prefWidth="100.0" styleClass="mesa-base" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <Button text="M9" prefHeight="70.0" prefWidth="100.0" styleClass="mesa-base" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                  <Button text="M10" prefHeight="70.0" prefWidth="100.0" styleClass="mesa-base" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                  <Button text="M11" prefHeight="70.0" prefWidth="100.0" styleClass="mesa-base" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <Button text="M12" prefHeight="70.0" prefWidth="100.0" styleClass="mesa-base" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+               </children>
+            </GridPane>
          </children>
       </VBox>
+
    </children>
 </AnchorPane>

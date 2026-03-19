@@ -7,6 +7,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+
 import java.util.List;
 
 /**
@@ -85,7 +86,8 @@ public class ClientesControlador {
     }
 
     private void mostrarDetalle(Cliente c) {
-        List<String> intol = clienteDAO.obtenerIntoleranciasDeCliente(c.getIdCliente());
+        List<String> intol;
+        intol = clienteDAO.obtenerIntoleranciasDeCliente(c.getIdCliente());
         String intolStr = intol.isEmpty() ? "Ninguna registrada" : String.join(", ", intol);
         txtDetalle.setText(
             "👤  " + c.getNombre() + "\n" +
