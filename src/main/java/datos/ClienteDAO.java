@@ -37,7 +37,7 @@ public class ClienteDAO {
      */
     public int registrarCliente(Cliente cliente) {
         String sql = "INSERT INTO clientes (nombre_completo, telefono, email, observaciones) " +
-                     "VALUES (?, ?, ?, ?)";
+                "VALUES (?, ?, ?, ?)";
 
         try (Connection conn = conexion.getConexion();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -48,15 +48,17 @@ public class ClienteDAO {
             stmt.setString(4, cliente.getObservaciones());
             stmt.executeUpdate();
 
-            // Recuperar el ID autogenerado por MySQL
             try (ResultSet keys = stmt.getGeneratedKeys()) {
-                if (keys.next()) return keys.getInt(1);
+                if (keys.next()) {
+                    return keys.getInt(1);
+                }
             }
 
         } catch (SQLException e) {
             System.err.println("Error al registrar cliente: " + e.getMessage());
         }
-        return -1;  // indica fallo
+
+        return -1;
     }
 
     /**
@@ -66,7 +68,7 @@ public class ClienteDAO {
     public List<Cliente> listarClientes() {
         List<Cliente> lista = new ArrayList<>();
         String sql = "SELECT id_cliente, nombre_completo, telefono, email, observaciones " +
-                     "FROM clientes ORDER BY nombre_completo";
+                "FROM clientes ORDER BY nombre_completo";
 
         try (Connection conn = conexion.getConexion();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -85,6 +87,7 @@ public class ClienteDAO {
         } catch (SQLException e) {
             System.err.println("Error al listar clientes: " + e.getMessage());
         }
+
         return lista;
     }
 
@@ -95,12 +98,13 @@ public class ClienteDAO {
      */
     public Cliente buscarPorTelefono(String telefono) {
         String sql = "SELECT id_cliente, nombre_completo, telefono, email, observaciones " +
-                     "FROM clientes WHERE telefono = ?";
+                "FROM clientes WHERE telefono = ?";
 
         try (Connection conn = conexion.getConexion();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, telefono);
+
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     Cliente c = new Cliente();
@@ -116,6 +120,7 @@ public class ClienteDAO {
         } catch (SQLException e) {
             System.err.println("Error al buscar cliente: " + e.getMessage());
         }
+
         return null;
     }
 
@@ -125,7 +130,7 @@ public class ClienteDAO {
      */
     public boolean actualizarCliente(Cliente cliente) {
         String sql = "UPDATE clientes SET nombre_completo = ?, telefono = ?, " +
-                     "email = ?, observaciones = ? WHERE id_cliente = ?";
+                "email = ?, observaciones = ? WHERE id_cliente = ?";
 
         try (Connection conn = conexion.getConexion();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -135,6 +140,7 @@ public class ClienteDAO {
             stmt.setString(3, cliente.getEmail());
             stmt.setString(4, cliente.getObservaciones());
             stmt.setInt(5, cliente.getIdCliente());
+
             return stmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
@@ -171,15 +177,13 @@ public class ClienteDAO {
     /**
      * Devuelve el catálogo completo de intolerancias ordenado por tipo y nombre.
      * El controlador usa este listado para construir el ComboBox agrupado:
-     *   - tipo ALERGENO_UE  → primeros 14 (sección "14 ALÉRGENOS OFICIALES UE")
-     *   - tipo INTOLERANCIA → resto      (sección "INTOLERANCIAS COMUNES")
+     *   - tipo ALERGENO_UE  → primeros 14
+     *   - tipo INTOLERANCIA → resto
      */
     public List<Intolerancia> obtenerCatalogoIntolerancias() {
         List<Intolerancia> lista = new ArrayList<>();
-        // Ordenamos: primero los ALERGENO_UE (por id, que coincide con el orden legal),
-        // luego las INTOLERANCIA comunes.
         String sql = "SELECT id_intolerancia, nombre, tipo FROM intolerancias " +
-                     "ORDER BY FIELD(tipo, 'ALERGENO_UE', 'INTOLERANCIA'), id_intolerancia";
+                "ORDER BY FIELD(tipo, 'ALERGENO_UE', 'INTOLERANCIA'), id_intolerancia";
 
         try (Connection conn = conexion.getConexion();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -196,24 +200,25 @@ public class ClienteDAO {
         } catch (SQLException e) {
             System.err.println("Error al obtener catálogo de intolerancias: " + e.getMessage());
         }
+
         return lista;
     }
 
     /**
      * Devuelve las intolerancias registradas para un cliente concreto.
-     * Se usa para mostrar la alerta visual al consultar una reserva (RF-14).
      */
     public List<Intolerancia> obtenerIntoleranciasPorCliente(int idCliente) {
         List<Intolerancia> lista = new ArrayList<>();
         String sql = "SELECT i.id_intolerancia, i.nombre, i.tipo " +
-                     "FROM intolerancias i " +
-                     "JOIN clientes_intolerancias ci ON i.id_intolerancia = ci.id_intolerancia " +
-                     "WHERE ci.id_cliente = ?";
+                "FROM intolerancias i " +
+                "JOIN clientes_intolerancias ci ON i.id_intolerancia = ci.id_intolerancia " +
+                "WHERE ci.id_cliente = ?";
 
         try (Connection conn = conexion.getConexion();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, idCliente);
+
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     lista.add(new Intolerancia(
@@ -227,17 +232,16 @@ public class ClienteDAO {
         } catch (SQLException e) {
             System.err.println("Error al obtener intolerancias del cliente: " + e.getMessage());
         }
+
         return lista;
     }
 
     /**
      * Vincula una intolerancia a un cliente.
-     * La tabla clientes_intolerancias tiene PK compuesta,
-     * así que insertar duplicados lanza excepción (se ignora silenciosamente).
      */
     public boolean vincularIntolerancia(int idCliente, int idIntolerancia) {
         String sql = "INSERT IGNORE INTO clientes_intolerancias (id_cliente, id_intolerancia) " +
-                     "VALUES (?, ?)";
+                "VALUES (?, ?)";
 
         try (Connection conn = conexion.getConexion();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -257,7 +261,7 @@ public class ClienteDAO {
      */
     public boolean desvincularIntolerancia(int idCliente, int idIntolerancia) {
         String sql = "DELETE FROM clientes_intolerancias " +
-                     "WHERE id_cliente = ? AND id_intolerancia = ?";
+                "WHERE id_cliente = ? AND id_intolerancia = ?";
 
         try (Connection conn = conexion.getConexion();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -270,5 +274,125 @@ public class ClienteDAO {
             System.err.println("Error al desvincular intolerancia: " + e.getMessage());
             return false;
         }
+    }
+
+    /**
+     * Devuelve solo los nombres de todas las intolerancias del catálogo.
+     */
+    public List<String> obtenerIntolerancias() {
+        List<String> lista = new ArrayList<>();
+        String sql = "SELECT nombre FROM intolerancias " +
+                "ORDER BY FIELD(tipo, 'ALERGENO_UE', 'INTOLERANCIA'), id_intolerancia";
+
+        try (Connection conn = conexion.getConexion();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                lista.add(rs.getString("nombre"));
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error al obtener intolerancias: " + e.getMessage());
+        }
+
+        return lista;
+    }
+
+    /**
+     * Devuelve los nombres de las intolerancias de un cliente.
+     */
+    public List<String> obtenerIntoleranciasDeCliente(int idCliente) {
+        List<String> lista = new ArrayList<>();
+        String sql = "SELECT i.nombre " +
+                "FROM intolerancias i " +
+                "JOIN clientes_intolerancias ci ON i.id_intolerancia = ci.id_intolerancia " +
+                "WHERE ci.id_cliente = ? " +
+                "ORDER BY i.nombre";
+
+        try (Connection conn = conexion.getConexion();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, idCliente);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(rs.getString("nombre"));
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error al obtener intolerancias del cliente: " + e.getMessage());
+        }
+
+        return lista;
+    }
+
+    /**
+     * Obtiene un cliente por su ID.
+     */
+    public Cliente obtenerClientePorId(int idCliente) {
+        String sql = "SELECT id_cliente, nombre_completo, telefono, email, observaciones " +
+                "FROM clientes WHERE id_cliente = ?";
+
+        try (Connection conn = conexion.getConexion();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, idCliente);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Cliente c = new Cliente();
+                    c.setIdCliente(rs.getInt("id_cliente"));
+                    c.setNombre(rs.getString("nombre_completo"));
+                    c.setTelefono(rs.getString("telefono"));
+                    c.setEmail(rs.getString("email"));
+                    c.setObservaciones(rs.getString("observaciones"));
+                    return c;
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error al obtener cliente por ID: " + e.getMessage());
+        }
+
+        return null;
+    }
+
+    /**
+     * Busca clientes por nombre, teléfono o email.
+     */
+    public List<Cliente> buscarClientes(String texto) {
+        List<Cliente> lista = new ArrayList<>();
+        String sql = "SELECT id_cliente, nombre_completo, telefono, email, observaciones " +
+                "FROM clientes " +
+                "WHERE nombre_completo LIKE ? OR telefono LIKE ? OR email LIKE ? " +
+                "ORDER BY nombre_completo";
+
+        try (Connection conn = conexion.getConexion();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            String filtro = "%" + texto + "%";
+            stmt.setString(1, filtro);
+            stmt.setString(2, filtro);
+            stmt.setString(3, filtro);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Cliente c = new Cliente();
+                    c.setIdCliente(rs.getInt("id_cliente"));
+                    c.setNombre(rs.getString("nombre_completo"));
+                    c.setTelefono(rs.getString("telefono"));
+                    c.setEmail(rs.getString("email"));
+                    c.setObservaciones(rs.getString("observaciones"));
+                    lista.add(c);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error al buscar clientes: " + e.getMessage());
+        }
+
+        return lista;
     }
 }

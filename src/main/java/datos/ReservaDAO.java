@@ -1,6 +1,7 @@
 package datos;
 
 import modelo.Reserva;
+import modelo.ReservaView;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -285,5 +286,21 @@ public class ReservaDAO {
         r.setNombreCliente(rs.getString("nombre_completo"));
         r.setNumeroMesa(rs.getString("numero_mesa"));
         return r;
+    }
+
+    public boolean cancelarReserva(int idReserva) {
+        return false;
+    }
+
+    public List<ReservaView> listarReservasView() {
+        return List.of();
+    }
+
+    public List<ReservaView> buscarReservas(String texto, String fecha) {
+        return List.of();
+    }
+
+    public Reserva obtenerReservaPorId(int idReserva) {
+        return null;
     }
 }

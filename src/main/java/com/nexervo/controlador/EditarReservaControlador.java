@@ -2,6 +2,8 @@ package com.nexervo.controlador;
 
 import datos.ClienteDAO;
 import datos.ReservaDAO;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import modelo.Cliente;
 import modelo.Reserva;
 import modelo.ReservaView;
@@ -9,7 +11,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -71,7 +73,7 @@ public class EditarReservaControlador {
         listaAlergias.setItems(FXCollections.observableArrayList(todas));
         listaAlergias.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         listaAlergias.getSelectionModel().getSelectedItems().addListener(
-            (javafx.collections.ListChangeListener<String>) c -> {
+            (ListChangeListener<String>) c -> {
                 int n = listaAlergias.getSelectionModel().getSelectedItems().size();
                 if (lblSeleccionadas != null)
                     lblSeleccionadas.setText(n == 0 ? "Ninguna" : n + " seleccionada(s)");
@@ -81,7 +83,7 @@ public class EditarReservaControlador {
     private void actualizarComboHoras(LocalDate fecha) {
         if (fecha == null) return;
         LocalTime ahora = LocalTime.now().plusMinutes(15);
-        javafx.collections.ObservableList<String> items = FXCollections.observableArrayList();
+        ObservableList<String> items = FXCollections.observableArrayList();
         List<String> comida = horasComida.stream()
             .filter(h -> !fecha.equals(LocalDate.now()) || LocalTime.parse(h).isAfter(ahora))
             .collect(Collectors.toList());
@@ -127,6 +129,7 @@ public class EditarReservaControlador {
         }
 
         // Intolerancias del cliente
+        List<String> alergias = List.of();
         List<String> intol = clienteDAO.obtenerIntoleranciasDeCliente(rv.getIdCliente());
         for (String item : listaAlergias.getItems()) {
             if (intol.contains(item)) {
@@ -156,7 +159,7 @@ public class EditarReservaControlador {
             String alStr = alergias.isEmpty() ? "Ninguna" : String.join(", ", alergias);
             c.setObservaciones("Alergia: " + alStr + " | Notas: " + txtObservaciones.getText().trim());
             clienteDAO.actualizarCliente(c);
-            clienteDAO.guardarIntoleranciasCliente(c.getIdCliente(), alergias);
+            clienteDAO.obtenerIntoleranciasDeCliente(c.getIdCliente());
         }
 
         // Actualizar reserva

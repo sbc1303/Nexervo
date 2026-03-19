@@ -5,28 +5,25 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * Gestiona la conexión JDBC con la base de datos nexervo_db.
- *
- * Con JDBC 4.0+ (incluido en mysql-connector-j 8.x), el driver se
- * registra automáticamente mediante ServiceLoader. El Class.forName()
- * explícito ya no es necesario y se ha eliminado.
- *
- * USO: cada DAO llama a getConexion() dentro de un try-with-resources
- * para garantizar el cierre automático de la conexión.
+ * Clase encargada de gestionar la conexión a la base de datos MySQL.
  */
 public class ConexionConMySQL {
 
-    private static final String URL     = "jdbc:mysql://localhost:3306/nexervo_db" +
-                                          "?useSSL=false&serverTimezone=Europe/Madrid";
+    // URL de conexión JDBC
+    private static final String URL =
+            "jdbc:mysql://localhost:3306/nexervo_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Europe/Madrid";
+
+    // Usuario de la base de datos
     private static final String USUARIO = "root";
-    // TODO: cambiar antes de desplegar en producción
-    private static final String CLAVE   = "MySQLBermejo1303!";
+
+    // Contraseña (IMPORTANTE: ajusta según tu configuración)
+    private static final String CLAVE = ""; // ← déjalo así si no tienes contraseña
 
     /**
-     * Devuelve una conexión activa a nexervo_db.
-     * Devuelve null si la conexión falla (el error se imprime en consola).
+     * Devuelve una conexión activa a la base de datos.
+     * @return Connection o null si falla
      */
-    public Connection getConexion() {
+    public static Connection getConexion() {
         try {
             return DriverManager.getConnection(URL, USUARIO, CLAVE);
         } catch (SQLException e) {

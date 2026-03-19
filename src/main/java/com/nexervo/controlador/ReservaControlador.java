@@ -7,10 +7,22 @@ import modelo.Intolerancia;
 import modelo.Reserva;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.DateCell;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.util.StringConverter;
 
@@ -22,37 +34,33 @@ import java.util.stream.Collectors;
 /**
  * Controlador de la vista principal de gestión de reservas.
  * Vinculado a gestiondereservas.fxml mediante @FXML.
- *
- * Flujo principal:
- *   1. Usuario rellena nombre, apellidos, teléfono, comensales, fecha, hora, mesa
- *   2. Al seleccionar fecha + turno → mapa de sala se actualiza en tiempo real
- *   3. Al confirmar → se busca o crea el cliente, se crea la reserva en BD
  */
 public class ReservaControlador {
 
     // ── Componentes FXML ─────────────────────────────────────────
-    @FXML private TextField          txtNombre;
-    @FXML private TextField          txtApellidos;
-    @FXML private TextField          txtTelefono;
-    @FXML private TextField          txtMesaSeleccionada;  // solo lectura, se rellena al pulsar una mesa
-    @FXML private Spinner<Integer>   spinnerComensales;
-    @FXML private DatePicker         fechaReserva;
-    @FXML private ComboBox<String>   comboHora;
-    @FXML private ComboBox<String>   comboAlergias;
-    @FXML private TextArea           txtObservaciones;
-    @FXML private GridPane           gridMapa;
+    @FXML private TextField txtNombre;
+    @FXML private TextField txtApellidos;
+    @FXML private TextField txtTelefono;
+    @FXML private TextField txtEmail;
+    @FXML private TextField txtMesaSeleccionada;
+    @FXML private Spinner<Integer> spinnerComensales;
+    @FXML private DatePicker fechaReserva;
+    @FXML private javafx.scene.control.ComboBox<String> comboHora;
+    @FXML private ListView<String> listaAlergias;
+    @FXML private Label lblSeleccionadas;
+    @FXML private TextArea txtObservaciones;
+    @FXML private GridPane gridMapa;
 
     // ── DAOs ─────────────────────────────────────────────────────
     private ClienteDAO clienteDAO;
     private ReservaDAO reservaDAO;
 
     // ── Estado interno ───────────────────────────────────────────
-    // id de la mesa seleccionada en el mapa (se resuelve desde ReservaDAO)
     private int idMesaSeleccionada = -1;
 
-    // Franjas horarias fijas por turno
     private static final List<String> HORAS_COMIDA =
             List.of("13:00", "13:30", "14:00", "14:30", "15:00");
+
     private static final List<String> HORAS_CENA =
             List.of("20:30", "21:00", "21:30", "22:00", "22:30");
 
@@ -68,33 +76,29 @@ public class ReservaControlador {
         configurarTelefono();
         configurarSpinner();
         configurarCalendario();
-        configurarComboAlergias();
+        configurarListaAlergias();
         configurarMapa();
 
-        // Actualizar horas y sala cuando cambia fecha o turno
-        fechaReserva.valueProperty().addListener((o, old, v) -> {
-            actualizarComboHoras(v);
+        fechaReserva.valueProperty().addListener((o, oldValue, newValue) -> {
+            actualizarComboHoras(newValue);
             actualizarSala();
         });
-        comboHora.valueProperty().addListener((o, old, v) -> actualizarSala());
+
+        comboHora.valueProperty().addListener((o, oldValue, newValue) -> actualizarSala());
     }
 
     // ════════════════════════════════════════════════════════════
     // CONFIGURACIÓN DE COMPONENTES
     // ════════════════════════════════════════════════════════════
 
-    /** Solo números, máximo 9 dígitos (formato español) */
     private void configurarTelefono() {
-        txtTelefono.textProperty().addListener((o, old, v) -> {
-            if (!v.matches("\\d*") || v.length() > 9) txtTelefono.setText(old);
+        txtTelefono.textProperty().addListener((o, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*") || newValue.length() > 9) {
+                txtTelefono.setText(oldValue);
+            }
         });
     }
 
-    /**
-     * StringConverter personalizado para evitar el NullPointerException
-     * que lanza el Spinner cuando el usuario borra el contenido del campo.
-     * Muestra vacío cuando el valor es 0, acepta cualquier entrada numérica.
-     */
     private void configurarSpinner() {
         SpinnerValueFactory<Integer> factory =
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 20, 0);
@@ -104,11 +108,17 @@ public class ReservaControlador {
             public String toString(Integer value) {
                 return (value == null || value == 0) ? "" : value.toString();
             }
+
             @Override
             public Integer fromString(String s) {
-                if (s == null || s.trim().isEmpty()) return 0;
-                try { return Integer.parseInt(s.trim()); }
-                catch (NumberFormatException e) { return 0; }
+                if (s == null || s.trim().isEmpty()) {
+                    return 0;
+                }
+                try {
+                    return Integer.parseInt(s.trim());
+                } catch (NumberFormatException e) {
+                    return 0;
+                }
             }
         });
 
@@ -116,13 +126,12 @@ public class ReservaControlador {
         spinnerComensales.setEditable(true);
     }
 
-    /** Bloquea fechas pasadas en el DatePicker */
     private void configurarCalendario() {
         fechaReserva.setDayCellFactory(picker -> new DateCell() {
             @Override
             public void updateItem(LocalDate date, boolean empty) {
                 super.updateItem(date, empty);
-                if (date.isBefore(LocalDate.now())) {
+                if (!empty && date.isBefore(LocalDate.now())) {
                     setDisable(true);
                     setStyle("-fx-background-color: #2a2a3b;");
                 }
@@ -130,45 +139,48 @@ public class ReservaControlador {
         });
     }
 
-    /**
-     * Carga el catálogo de intolerancias desde la BD y construye el ComboBox
-     * con dos secciones separadas por cabeceras no seleccionables:
-     *   → "14 ALÉRGENOS OFICIALES (UE)"
-     *   → "INTOLERANCIAS COMUNES"
-     */
-    private void configurarComboAlergias() {
+    private void configurarListaAlergias() {
         List<Intolerancia> catalogo = clienteDAO.obtenerCatalogoIntolerancias();
         ObservableList<String> items = FXCollections.observableArrayList();
 
-        items.add("--- NINGUNA ---");
-        items.add("--- 14 ALÉRGENOS OFICIALES (UE) ---");
-
-        // Los primeros 14 son ALERGENO_UE (el SQL los devuelve ordenados así)
-        catalogo.stream()
-                .filter(i -> "ALERGENO_UE".equals(i.getTipo()))
-                .forEach(i -> items.add(i.getNombre()));
-
-        items.add("--- INTOLERANCIAS COMUNES ---");
+        items.add("NINGUNA");
 
         catalogo.stream()
-                .filter(i -> "INTOLERANCIA".equals(i.getTipo()))
+                .filter(i -> "ALERGENO_UE".equalsIgnoreCase(i.getTipo()) || "INTOLERANCIA".equalsIgnoreCase(i.getTipo()))
                 .forEach(i -> items.add(i.getNombre()));
 
-        comboAlergias.setItems(items);
+        listaAlergias.setItems(items);
+        listaAlergias.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        // Impedir que el usuario seleccione una cabecera como valor real
-        comboAlergias.valueProperty().addListener((o, old, v) -> {
-            if (v != null && v.startsWith("---") && !v.equals("--- NINGUNA ---")) {
-                comboAlergias.setValue(old);
-            }
-        });
+        listaAlergias.getSelectionModel().getSelectedItems().addListener(
+                (ListChangeListener<String>) change -> actualizarTextoAlergiasSeleccionadas()
+        );
+
+        lblSeleccionadas.setText("Ninguna seleccionada");
     }
 
-    /**
-     * Asigna la acción de selección a cada botón del mapa.
-     * Al pulsar un botón: se marca visualmente y se guarda su número
-     * en txtMesaSeleccionada para que el controlador lo lea al confirmar.
-     */
+    private void actualizarTextoAlergiasSeleccionadas() {
+        ObservableList<String> seleccionadas = listaAlergias.getSelectionModel().getSelectedItems();
+
+        if (seleccionadas == null || seleccionadas.isEmpty()) {
+            lblSeleccionadas.setText("Ninguna seleccionada");
+            return;
+        }
+
+        if (seleccionadas.contains("NINGUNA")) {
+            listaAlergias.getSelectionModel().clearSelection();
+            int indexNinguna = listaAlergias.getItems().indexOf("NINGUNA");
+            if (indexNinguna >= 0) {
+                listaAlergias.getSelectionModel().select(indexNinguna);
+            }
+            lblSeleccionadas.setText("Ninguna seleccionada");
+            return;
+        }
+
+        String texto = seleccionadas.stream().collect(Collectors.joining(", "));
+        lblSeleccionadas.setText(texto);
+    }
+
     private void configurarMapa() {
         for (Node node : gridMapa.getChildren()) {
             if (node instanceof Button btn) {
@@ -178,15 +190,14 @@ public class ReservaControlador {
     }
 
     private void seleccionarMesa(Button btn) {
-        // Quitar selección anterior
-        gridMapa.getChildren().forEach(n -> {
-            if (n instanceof Button b) b.getStyleClass().remove("mesa-reservada");
-        });
-        // Marcar la nueva selección
+        for (Node node : gridMapa.getChildren()) {
+            if (node instanceof Button b) {
+                b.getStyleClass().remove("mesa-reservada");
+            }
+        }
+
         btn.getStyleClass().add("mesa-reservada");
         txtMesaSeleccionada.setText(btn.getText());
-
-        // Resolver el id_mesa desde la BD para usarlo al crear la reserva
         idMesaSeleccionada = reservaDAO.resolverIdMesa(btn.getText());
     }
 
@@ -194,13 +205,13 @@ public class ReservaControlador {
     // LÓGICA DE SALA
     // ════════════════════════════════════════════════════════════
 
-    /**
-     * Filtra las horas del ComboBox según el turno y la hora actual.
-     * Si la fecha es hoy, elimina las horas que ya han pasado
-     * (con un margen de 15 minutos para no crear reservas imposibles).
-     */
     private void actualizarComboHoras(LocalDate fecha) {
-        if (fecha == null) return;
+        if (fecha == null) {
+            comboHora.getItems().clear();
+            comboHora.setValue(null);
+            return;
+        }
+
         LocalTime margen = LocalTime.now().plusMinutes(15);
         ObservableList<String> items = FXCollections.observableArrayList();
 
@@ -212,29 +223,31 @@ public class ReservaControlador {
                 .filter(h -> !fecha.equals(LocalDate.now()) || LocalTime.parse(h).isAfter(margen))
                 .collect(Collectors.toList());
 
-        if (!comida.isEmpty()) { items.add("--- TURNO COMIDA ---"); items.addAll(comida); }
-        if (!cena.isEmpty())   { items.add("--- TURNO CENA ---");   items.addAll(cena); }
+        if (!comida.isEmpty()) {
+            items.add("--- TURNO COMIDA ---");
+            items.addAll(comida);
+        }
+
+        if (!cena.isEmpty()) {
+            items.add("--- TURNO CENA ---");
+            items.addAll(cena);
+        }
 
         comboHora.setItems(items);
+        comboHora.setValue(null);
     }
 
-    /**
-     * Actualiza el estado visual del mapa de sala consultando la BD.
-     * Solo se ejecuta si hay fecha y turno seleccionados.
-     *
-     * Estados visuales:
-     *   mesa-libre    → verde, seleccionable
-     *   mesa-ocupada  → rojo/gris, deshabilitada (opacidad 0.5)
-     */
     private void actualizarSala() {
         boolean datosCompletos = fechaReserva.getValue() != null
                 && comboHora.getValue() != null
                 && !comboHora.getValue().startsWith("---");
 
         gridMapa.setVisible(datosCompletos);
-        if (!datosCompletos) return;
 
-        // Obtener mesas ocupadas para esta fecha y turno desde ReservaDAO
+        if (!datosCompletos) {
+            return;
+        }
+
         List<String> ocupadas = reservaDAO.obtenerMesasOcupadas(
                 fechaReserva.getValue(),
                 comboHora.getValue()
@@ -242,7 +255,6 @@ public class ReservaControlador {
 
         for (Node node : gridMapa.getChildren()) {
             if (node instanceof Button btn) {
-                // Reset completo antes de aplicar el nuevo estado
                 btn.getStyleClass().removeAll("mesa-libre", "mesa-ocupada", "mesa-reservada");
                 btn.setDisable(false);
                 btn.setOpacity(1.0);
@@ -251,6 +263,11 @@ public class ReservaControlador {
                     btn.getStyleClass().add("mesa-ocupada");
                     btn.setDisable(true);
                     btn.setOpacity(0.5);
+
+                    if (btn.getText().equals(txtMesaSeleccionada.getText())) {
+                        txtMesaSeleccionada.clear();
+                        idMesaSeleccionada = -1;
+                    }
                 } else {
                     btn.getStyleClass().add("mesa-libre");
                 }
@@ -262,30 +279,37 @@ public class ReservaControlador {
     // ACCIONES DE BOTONES
     // ════════════════════════════════════════════════════════════
 
-    /**
-     * Valida el formulario, busca o crea el cliente y registra la reserva.
-     *
-     * Flujo:
-     *   1. Validar campos obligatorios
-     *   2. Buscar cliente por teléfono → si no existe, crearlo
-     *   3. Crear la reserva en la tabla reservas vía ReservaDAO
-     *   4. Actualizar el mapa de sala
-     */
     @FXML
-    public void onConfirmarClick() {
-        if (!validarFormulario()) return;
+    private void onVerReservas(ActionEvent event) {
+        // Ya estás en la pantalla de reservas.
+        mostrarAlerta("Información", "Ya estás en la vista de reservas.");
+    }
 
-        // ── 1. Buscar o crear cliente ────────────────────────────
+    @FXML
+    private void onVerClientes(ActionEvent event) {
+        // Método temporal para evitar el error del FXML.
+        // Luego se puede cambiar para abrir listado_clientes.fxml.
+        mostrarAlerta("Información", "Navegación a clientes pendiente de implementar.");
+    }
+
+    @FXML
+    private void onConfirmarClick(ActionEvent event) {
+        if (!validarFormulario()) {
+            return;
+        }
+
         Cliente cliente = clienteDAO.buscarPorTelefono(txtTelefono.getText());
 
         if (cliente == null) {
-            // Cliente nuevo: registrarlo y obtener su id
+            String nombreCompleto = (txtNombre.getText().trim() + " " + txtApellidos.getText().trim()).trim();
+
             cliente = new Cliente(
-                    txtNombre.getText() + " " + txtApellidos.getText(),
-                    txtTelefono.getText(),
-                    null,           // email: no se pide en este formulario
-                    null            // observaciones: se añaden desde la vista de gestión
+                    nombreCompleto,
+                    txtTelefono.getText().trim(),
+                    txtEmail.getText().isBlank() ? null : txtEmail.getText().trim(),
+                    null
             );
+
             int idNuevo = clienteDAO.registrarCliente(cliente);
             if (idNuevo == -1) {
                 mostrarAlerta("Error", "No se pudo registrar el cliente. Comprueba la conexión.");
@@ -294,14 +318,24 @@ public class ReservaControlador {
             cliente.setIdCliente(idNuevo);
         }
 
-        // ── 2. Construir la reserva ──────────────────────────────
-        String alergia = (comboAlergias.getValue() == null
-                || comboAlergias.getValue().startsWith("---"))
-                ? null
-                : comboAlergias.getValue();
+        List<String> seleccionadas = listaAlergias.getSelectionModel().getSelectedItems();
 
-        // El número de comensales mínimo es 1 aunque el spinner muestre vacío
-        int comensales = (spinnerComensales.getValue() == 0) ? 1 : spinnerComensales.getValue();
+        String textoAlergias = null;
+        if (seleccionadas != null && !seleccionadas.isEmpty() && !seleccionadas.contains("NINGUNA")) {
+            textoAlergias = seleccionadas.stream().collect(Collectors.joining(", "));
+        }
+
+        int comensales = spinnerComensales.getValue() == null || spinnerComensales.getValue() == 0
+                ? 1
+                : spinnerComensales.getValue();
+
+        String observacionesFinales = "";
+        if (textoAlergias != null && !textoAlergias.isBlank()) {
+            observacionesFinales += "Alergias/Intolerancias: " + textoAlergias + ". ";
+        }
+        if (txtObservaciones.getText() != null && !txtObservaciones.getText().isBlank()) {
+            observacionesFinales += txtObservaciones.getText().trim();
+        }
 
         Reserva reserva = new Reserva(
                 cliente.getIdCliente(),
@@ -309,11 +343,9 @@ public class ReservaControlador {
                 fechaReserva.getValue(),
                 LocalTime.parse(comboHora.getValue()),
                 comensales,
-                (alergia != null ? "Alergia: " + alergia + ". " : "")
-                        + txtObservaciones.getText()
+                observacionesFinales.isBlank() ? null : observacionesFinales
         );
 
-        // ── 3. Guardar la reserva en BD ──────────────────────────
         int idReserva = reservaDAO.crearReserva(reserva);
         if (idReserva == -1) {
             mostrarAlerta("Error", "No se pudo guardar la reserva. Comprueba la conexión.");
@@ -322,58 +354,81 @@ public class ReservaControlador {
 
         mostrarAlerta("Reserva confirmada",
                 "Reserva registrada correctamente para " + cliente.getNombre() + ".");
-        onLimpiarClick();
+
+        onLimpiarClick(null);
         actualizarSala();
     }
 
     @FXML
-    public void onLimpiarClick() {
+    private void onLimpiarClick(ActionEvent event) {
         txtNombre.clear();
         txtApellidos.clear();
         txtTelefono.clear();
+        txtEmail.clear();
         txtMesaSeleccionada.clear();
         txtObservaciones.clear();
+
         fechaReserva.setValue(null);
         comboHora.setValue(null);
-        comboAlergias.setValue(null);
-        spinnerComensales.getValueFactory().setValue(0);
+        comboHora.getItems().clear();
+
+        if (listaAlergias != null) {
+            listaAlergias.getSelectionModel().clearSelection();
+        }
+
+        lblSeleccionadas.setText("Ninguna seleccionada");
+
+        if (spinnerComensales.getValueFactory() != null) {
+            spinnerComensales.getValueFactory().setValue(0);
+        }
+
         gridMapa.setVisible(false);
         idMesaSeleccionada = -1;
+
+        for (Node node : gridMapa.getChildren()) {
+            if (node instanceof Button btn) {
+                btn.getStyleClass().removeAll("mesa-libre", "mesa-ocupada", "mesa-reservada");
+                btn.setDisable(false);
+                btn.setOpacity(1.0);
+            }
+        }
     }
 
     // ════════════════════════════════════════════════════════════
-    // UTILIDADES
+    // VALIDACIONES Y UTILIDADES
     // ════════════════════════════════════════════════════════════
 
-    /**
-     * Comprueba que todos los campos obligatorios estén rellenos.
-     * Devuelve false y muestra alerta si falta alguno.
-     */
     private boolean validarFormulario() {
-        if (txtNombre.getText().isBlank()) {
+        if (txtNombre.getText() == null || txtNombre.getText().isBlank()) {
             mostrarAlerta("Campo requerido", "Introduce el nombre del cliente.");
             return false;
         }
-        if (txtApellidos.getText().isBlank()) {
+
+        if (txtApellidos.getText() == null || txtApellidos.getText().isBlank()) {
             mostrarAlerta("Campo requerido", "Introduce los apellidos del cliente.");
             return false;
         }
-        if (txtTelefono.getText().isBlank()) {
+
+        if (txtTelefono.getText() == null || txtTelefono.getText().isBlank()) {
             mostrarAlerta("Campo requerido", "Introduce el teléfono del cliente.");
             return false;
         }
+
         if (fechaReserva.getValue() == null) {
             mostrarAlerta("Campo requerido", "Selecciona una fecha para la reserva.");
             return false;
         }
+
         if (comboHora.getValue() == null || comboHora.getValue().startsWith("---")) {
             mostrarAlerta("Campo requerido", "Selecciona un turno y hora.");
             return false;
         }
-        if (txtMesaSeleccionada.getText().isBlank() || idMesaSeleccionada == -1) {
+
+        if (txtMesaSeleccionada.getText() == null || txtMesaSeleccionada.getText().isBlank() || idMesaSeleccionada == -1) {
             mostrarAlerta("Mesa no seleccionada", "Selecciona una mesa del mapa.");
             return false;
         }
+
         return true;
     }
 
