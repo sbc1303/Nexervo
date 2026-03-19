@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="12.0" styleClass="root" stylesheets="@Estilo.css"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.nexervo.controlador.ClientesControlador">
+   <padding><Insets top="18" right="18" bottom="18" left="18"/></padding>
+   <children>
+
+      <Label text="HISTORIAL DE CLIENTES"
+             style="-fx-font-size:20px; -fx-text-fill:#00C6FF; -fx-font-weight:bold;" />
+
+      <HBox spacing="12.0" alignment="CENTER_LEFT">
+         <TextField fx:id="filtroBusqueda" prefWidth="240" promptText="Buscar por nombre o telefono..." />
+         <Button text="BUSCAR"   onAction="#onBuscarClick"  styleClass="boton-confirmar"  prefWidth="100" prefHeight="35" />
+         <Button text="VER TODOS" onAction="#onMostrarTodos" styleClass="boton-secundario" prefWidth="100" prefHeight="35" />
+      </HBox>
+
+      <SplitPane VBox.vgrow="ALWAYS" dividerPositions="0.65">
+         <items>
+            <!-- Tabla clientes -->
+            <TableView fx:id="tablaClientes">
+               <columns>
+                  <TableColumn fx:id="colNombre"       text="Nombre"        prefWidth="190" />
+                  <TableColumn fx:id="colTelefono"     text="Telefono"      prefWidth="105" />
+                  <TableColumn fx:id="colEmail"        text="Email"         prefWidth="160" />
+                  <TableColumn fx:id="colIntolerancias" text="Intolerancias" prefWidth="160" />
+               </columns>
+               <placeholder><Label text="Sin clientes registrados." style="-fx-text-fill:#888;" /></placeholder>
+            </TableView>
+
+            <!-- Panel detalle -->
+            <VBox spacing="8.0">
+               <padding><Insets top="8" left="12" right="8" bottom="8"/></padding>
+               <Label text="Ficha del cliente" style="-fx-text-fill:#00C6FF; -fx-font-weight:bold;" />
+               <TextArea fx:id="txtDetalle" editable="false" wrapText="true" VBox.vgrow="ALWAYS"
+                         promptText="Selecciona un cliente..." />
+            </VBox>
+         </items>
+      </SplitPane>
+
+      <HBox spacing="12.0" alignment="CENTER_RIGHT">
+         <Label fx:id="lblTotal" text="" style="-fx-text-fill:#AAAAAA;" HBox.hgrow="ALWAYS" />
+         <Button text="ELIMINAR CLIENTE" onAction="#onEliminarCliente"
+                 styleClass="boton-cancelar" prefWidth="165" prefHeight="38" />
+         <Button text="Cerrar" onAction="#onCerrar"
+                 styleClass="boton-secundario" prefWidth="90" prefHeight="38" />
+      </HBox>
+
+   </children>
+</VBox>

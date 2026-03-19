@@ -1,109 +1,38 @@
-package datos;
+package modelo;
 
-import modelo.Mesa;
+public class Mesa {
+    private int idMesa;
+    private String numeroMesa;
+    private int capacidad;
+    private String descripcion;
+    private String estado; // "LIBRE", "OCUPADA", "RESERVADA"
 
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-
-/**
- * DAO para la tabla 'mesas'.
- *
- * Responsabilidades:
- *   - Cargar el inventario de mesas desde la BD
- *   - Actualizar el estado de una mesa
- *
- * En fases futuras este DAO alimentará un mapa de sala
- * generado dinámicamente en lugar del GridPane estático del FXML.
- */
-public class MesaDAO {
-
-    private final ConexionConMySQL conexion;
-
-    public MesaDAO() {
-        this.conexion = new ConexionConMySQL();
+    public Mesa(int idMesa, String numeroMesa, int capacidad, String descripcion, String estado) {
+        this.idMesa = idMesa;
+        this.numeroMesa = numeroMesa;
+        this.capacidad = capacidad;
+        this.descripcion = descripcion;
+        this.estado = estado;
     }
 
-    /**
-     * Devuelve todas las mesas ordenadas por número.
-     * Se usa para poblar el mapa de sala y la vista de administración.
-     */
-    public List<Mesa> listarMesas() {
-        List<Mesa> lista = new ArrayList<>();
-        String sql = "SELECT id_mesa, numero_mesa, capacidad, estado, descripcion " +
-                "FROM mesas ORDER BY id_mesa";
+    // Getters y Setters
+    public int getIdMesa() { return idMesa; }
+    public void setIdMesa(int idMesa) { this.idMesa = idMesa; }
 
-        try (Connection conn = conexion.getConexion();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+    public String getNumeroMesa() { return numeroMesa; }
+    public void setNumeroMesa(String numeroMesa) { this.numeroMesa = numeroMesa; }
 
-            while (rs.next()) {
-                lista.add(new Mesa(
-                        rs.getInt("id_mesa"),
-                        rs.getString("numero_mesa"),
-                        rs.getInt("capacidad"),
-                        rs.getString("descripcion"),
-                        rs.getString("estado")
-                ));
-            }
+    public int getCapacidad() { return capacidad; }
+    public void setCapacidad(int capacidad) { this.capacidad = capacidad; }
 
-        } catch (SQLException e) {
-            System.err.println("Error al listar mesas: " + e.getMessage());
-        }
-        return lista;
-    }
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 
-    /**
-     * Busca una mesa por su número visual (ej: "M1").
-     * Devuelve null si no existe.
-     */
-    public Mesa buscarPorNumero(String numeroMesa) {
-        String sql = "SELECT id_mesa, numero_mesa, capacidad, estado, descripcion " +
-                "FROM mesas WHERE numero_mesa = ?";
+    public String getEstado() { return estado; }
+    public void setEstado(String estado) { this.estado = estado; }
 
-        try (Connection conn = conexion.getConexion();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, numeroMesa);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return new Mesa(
-                            rs.getInt("id_mesa"),
-                            rs.getString("numero_mesa"),
-                            rs.getInt("capacidad"),
-                            rs.getString("descripcion"),
-                            rs.getString("estado")
-                    );
-                }
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Error al buscar mesa: " + e.getMessage());
-        }
-        return null;
-    }
-
-    /**
-     * Actualiza el estado permanente de una mesa.
-     * Valores válidos: "LIBRE", "OCUPADA", "RESERVADA"
-     *
-     * Nota: el estado dinámico por turno se gestiona en ReservaDAO,
-     * no aquí. Este método es para cambios manuales del administrador
-     * (ej: cerrar una mesa por mantenimiento).
-     */
-    public boolean actualizarEstado(int idMesa, String nuevoEstado) {
-        String sql = "UPDATE mesas SET estado = ? WHERE id_mesa = ?";
-
-        try (Connection conn = conexion.getConexion();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, nuevoEstado);
-            stmt.setInt(2, idMesa);
-            return stmt.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            System.err.println("Error al actualizar estado de mesa: " + e.getMessage());
-            return false;
-        }
+    @Override
+    public String toString() {
+        return "Mesa " + numeroMesa + " (" + capacidad + " pax)";
     }
 }
