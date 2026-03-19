@@ -17,7 +17,7 @@ import java.sql.SQLException;
 public class ConexionConMySQL {
 
     private static final String URL     = "jdbc:mysql://localhost:3306/nexervo_db" +
-            "?useSSL=false&serverTimezone=Europe/Madrid";
+                                          "?useSSL=false&serverTimezone=Europe/Madrid";
     private static final String USUARIO = "root";
     // TODO: cambiar antes de desplegar en producción
     private static final String CLAVE   = "MySQLBermejo1303!";

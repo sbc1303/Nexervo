@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="12.0" styleClass="root" stylesheets="@Estilo.css"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.nexervo.controlador.EditarReservaControlador">
+   <padding><Insets top="20" right="24" bottom="20" left="24"/></padding>
+   <children>
+
+      <Label text="EDITAR RESERVA"
+             style="-fx-font-size:18px; -fx-text-fill:#00C6FF; -fx-font-weight:bold;" />
+
+      <Label fx:id="lblMesa" text="" style="-fx-text-fill:#FFC107; -fx-font-size:12px;" />
+
+      <HBox spacing="12.0">
+         <VBox HBox.hgrow="ALWAYS"><Label text="Nombre *" /><TextField fx:id="txtNombre" /></VBox>
+         <VBox HBox.hgrow="ALWAYS"><Label text="Apellidos *" /><TextField fx:id="txtApellidos" /></VBox>
+      </HBox>
+
+      <HBox spacing="12.0">
+         <VBox HBox.hgrow="ALWAYS"><Label text="Telefono *" /><TextField fx:id="txtTelefono" /></VBox>
+         <VBox HBox.hgrow="ALWAYS"><Label text="Email" /><TextField fx:id="txtEmail" /></VBox>
+      </HBox>
+
+      <HBox spacing="12.0">
+         <VBox HBox.hgrow="ALWAYS"><Label text="Comensales *" /><Spinner fx:id="spinnerComensales" editable="true" maxWidth="Infinity" /></VBox>
+         <VBox HBox.hgrow="ALWAYS"><Label text="Fecha *" /><DatePicker fx:id="fechaReserva" maxWidth="Infinity" /></VBox>
+      </HBox>
+
+      <Label text="Turno y Hora *" />
+      <ComboBox fx:id="comboHora" maxWidth="Infinity" />
+
+      <Label text="Alergenos e Intolerancias:" />
+      <ListView fx:id="listaAlergias" prefHeight="100.0" />
+      <Label fx:id="lblSeleccionadas" text="" style="-fx-text-fill:#FFC107; -fx-font-size:11px;" />
+
+      <Label text="Notas:" />
+      <TextArea fx:id="txtObservaciones" prefHeight="60.0" wrapText="true" />
+
+      <HBox alignment="CENTER_RIGHT" spacing="12.0">
+         <padding><Insets top="8"/></padding>
+         <Button text="GUARDAR CAMBIOS" onAction="#onGuardarClick"
+                 styleClass="boton-confirmar" prefWidth="175" prefHeight="40" />
+         <Button text="Cancelar" onAction="#onCancelarClick"
+                 styleClass="boton-secundario" prefWidth="100" prefHeight="40" />
+      </HBox>
+
+   </children>
+</VBox>
