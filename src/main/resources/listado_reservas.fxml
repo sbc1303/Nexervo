@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="12.0" styleClass="root" stylesheets="@Estilo.css"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.nexervo.controlador.ListadoControlador">
+   <padding><Insets top="18" right="18" bottom="18" left="18"/></padding>
+   <children>
+
+      <Label text="GESTION DE RESERVAS"
+             style="-fx-font-size:20px; -fx-text-fill:#00C6FF; -fx-font-weight:bold;" />
+
+      <!-- Filtros -->
+      <HBox spacing="12.0" alignment="CENTER_LEFT">
+         <Label text="Fecha:" />
+         <DatePicker fx:id="filtroFecha" />
+         <Label text="Buscar:" />
+         <TextField fx:id="filtroBusqueda" prefWidth="200" promptText="Nombre o telefono..." />
+         <Button text="BUSCAR"       onAction="#onBuscarClick"  styleClass="boton-confirmar"  prefWidth="100" prefHeight="35" />
+         <Button text="TODAS"        onAction="#onMostrarTodas" styleClass="boton-secundario" prefWidth="90"  prefHeight="35" />
+      </HBox>
+
+      <!-- Tabla -->
+      <TableView fx:id="tablaReservas" VBox.vgrow="ALWAYS">
+         <columns>
+            <TableColumn fx:id="colId"       text="ID"       prefWidth="50"  />
+            <TableColumn fx:id="colNombre"   text="Cliente"  prefWidth="160" />
+            <TableColumn fx:id="colTelefono" text="Telefono" prefWidth="100" />
+            <TableColumn fx:id="colEmail"    text="Email"    prefWidth="155" />
+            <TableColumn fx:id="colMesa"     text="Mesa"     prefWidth="80"  />
+            <TableColumn fx:id="colFecha"    text="Fecha"    prefWidth="100" />
+            <TableColumn fx:id="colTurno"    text="Hora"     prefWidth="75"  />
+            <TableColumn fx:id="colPersonas" text="Pax"      prefWidth="50"  />
+            <TableColumn fx:id="colAlergia"  text="Alergia"  prefWidth="140" />
+            <TableColumn fx:id="colNotas"    text="Notas"    prefWidth="160" />
+         </columns>
+         <placeholder><Label text="No hay reservas." style="-fx-text-fill:#888;" /></placeholder>
+      </TableView>
+
+      <!-- Info + Botones -->
+      <HBox spacing="12.0" alignment="CENTER_RIGHT">
+         <Label fx:id="lblTotal" text="" style="-fx-text-fill:#AAAAAA;" HBox.hgrow="ALWAYS" />
+         <Button text="Ver Cliente"      onAction="#onVerCliente"     styleClass="boton-nav"       prefWidth="130" prefHeight="38" />
+         <Button text="Editar"           onAction="#onEditarReserva"  styleClass="boton-secundario" prefWidth="100" prefHeight="38" />
+         <Button text="CANCELAR RESERVA" onAction="#onCancelarReserva" styleClass="boton-cancelar"  prefWidth="175" prefHeight="38" />
+         <Button text="Cerrar"           onAction="#onCerrar"          styleClass="boton-secundario" prefWidth="90"  prefHeight="38" />
+      </HBox>
+
+   </children>
+</VBox>
