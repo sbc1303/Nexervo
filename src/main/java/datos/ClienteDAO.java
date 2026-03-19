@@ -35,9 +35,9 @@ public class ClienteDAO {
      * Usamos RETURN_GENERATED_KEYS para recuperar el ID
      * y poder vincularlo inmediatamente a una reserva.
      */
-    public boolean registrarCliente(Cliente cliente) {
+    public int registrarCliente(Cliente cliente) {
         String sql = "INSERT INTO clientes (nombre_completo, telefono, email, observaciones) " +
-                "VALUES (?, ?, ?, ?)";
+                     "VALUES (?, ?, ?, ?)";
 
         try (Connection conn = conexion.getConexion();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -66,7 +66,7 @@ public class ClienteDAO {
     public List<Cliente> listarClientes() {
         List<Cliente> lista = new ArrayList<>();
         String sql = "SELECT id_cliente, nombre_completo, telefono, email, observaciones " +
-                "FROM clientes ORDER BY nombre_completo";
+                     "FROM clientes ORDER BY nombre_completo";
 
         try (Connection conn = conexion.getConexion();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -95,7 +95,7 @@ public class ClienteDAO {
      */
     public Cliente buscarPorTelefono(String telefono) {
         String sql = "SELECT id_cliente, nombre_completo, telefono, email, observaciones " +
-                "FROM clientes WHERE telefono = ?";
+                     "FROM clientes WHERE telefono = ?";
 
         try (Connection conn = conexion.getConexion();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -125,7 +125,7 @@ public class ClienteDAO {
      */
     public boolean actualizarCliente(Cliente cliente) {
         String sql = "UPDATE clientes SET nombre_completo = ?, telefono = ?, " +
-                "email = ?, observaciones = ? WHERE id_cliente = ?";
+                     "email = ?, observaciones = ? WHERE id_cliente = ?";
 
         try (Connection conn = conexion.getConexion();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -179,7 +179,7 @@ public class ClienteDAO {
         // Ordenamos: primero los ALERGENO_UE (por id, que coincide con el orden legal),
         // luego las INTOLERANCIA comunes.
         String sql = "SELECT id_intolerancia, nombre, tipo FROM intolerancias " +
-                "ORDER BY FIELD(tipo, 'ALERGENO_UE', 'INTOLERANCIA'), id_intolerancia";
+                     "ORDER BY FIELD(tipo, 'ALERGENO_UE', 'INTOLERANCIA'), id_intolerancia";
 
         try (Connection conn = conexion.getConexion();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -206,9 +206,9 @@ public class ClienteDAO {
     public List<Intolerancia> obtenerIntoleranciasPorCliente(int idCliente) {
         List<Intolerancia> lista = new ArrayList<>();
         String sql = "SELECT i.id_intolerancia, i.nombre, i.tipo " +
-                "FROM intolerancias i " +
-                "JOIN clientes_intolerancias ci ON i.id_intolerancia = ci.id_intolerancia " +
-                "WHERE ci.id_cliente = ?";
+                     "FROM intolerancias i " +
+                     "JOIN clientes_intolerancias ci ON i.id_intolerancia = ci.id_intolerancia " +
+                     "WHERE ci.id_cliente = ?";
 
         try (Connection conn = conexion.getConexion();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -237,7 +237,7 @@ public class ClienteDAO {
      */
     public boolean vincularIntolerancia(int idCliente, int idIntolerancia) {
         String sql = "INSERT IGNORE INTO clientes_intolerancias (id_cliente, id_intolerancia) " +
-                "VALUES (?, ?)";
+                     "VALUES (?, ?)";
 
         try (Connection conn = conexion.getConexion();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -257,7 +257,7 @@ public class ClienteDAO {
      */
     public boolean desvincularIntolerancia(int idCliente, int idIntolerancia) {
         String sql = "DELETE FROM clientes_intolerancias " +
-                "WHERE id_cliente = ? AND id_intolerancia = ?";
+                     "WHERE id_cliente = ? AND id_intolerancia = ?";
 
         try (Connection conn = conexion.getConexion();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
