@@ -1,23 +1,6 @@
-# IntelliJ IDEA
-.idea/
-*.iml
-
-# Maven
 target/
-
-# macOS
+*.class
+*.iml
+.idea/
 .DS_Store
-
-# Logs
 *.log
-
-# Variables de entorno
-.env
-.env.*
-
-# VS Code
-.vscode/
-
-# Archivos temporales
-*.swp
-*.swo
