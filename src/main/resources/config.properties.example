@@ -1,0 +1,26 @@
+# ═══════════════════════════════════════════════════════
+#  NEXERVO — Configuración
+#
+#  Copia este fichero como "config.properties" en el mismo
+#  directorio y rellena tus valores. El fichero real está
+#  en .gitignore para que las credenciales no suban al repo.
+# ═══════════════════════════════════════════════════════
+
+# ── Base de datos ────────────────────────────────────────
+db.host=localhost
+db.port=3306
+db.nombre=nexervo_db
+db.usuario=root
+db.clave=TU_CONTRASEÑA_MYSQL
+
+# ── Email (opcional) ─────────────────────────────────────
+# Ponlo a false para deshabilitar el envío en desarrollo.
+# Para Gmail: activa "Contraseñas de aplicación" en tu cuenta
+# (Seguridad → Verificación en 2 pasos → Contraseñas de app)
+# y pega aquí la contraseña de 16 caracteres generada.
+email.habilitado=false
+email.smtp.host=smtp.gmail.com
+email.smtp.port=587
+email.smtp.usuario=TU_EMAIL@gmail.com
+email.smtp.clave=CONTRASEÑA_DE_APLICACIÓN_16_CHARS
+email.remitente.nombre=NEXERVO Restaurante
