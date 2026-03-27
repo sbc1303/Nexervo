@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane fx:id="panelRaiz" stylesheets="@/Estilo.css"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.nexervo.controlador.PrincipalControlador">
+    <left>
+        <VBox styleClass="sidebar" prefWidth="228" spacing="4">
+            <padding><Insets top="20" right="12" bottom="20" left="12"/></padding>
+
+            <!-- FIX 5: logo_fondo_oscuro — se ve perfectamente sobre la sidebar oscura -->
+            <ImageView fitHeight="62" fitWidth="190" preserveRatio="true" pickOnBounds="true">
+                <image><Image url="@/img/logo_fondo_oscuro.png"/></image>
+            </ImageView>
+
+            <Label fx:id="lblUsuario" styleClass="label-usuario" wrapText="true"
+                   style="-fx-padding: 2 0 2 4;"/>
+
+            <Separator style="-fx-background-color:#3D2E8A; -fx-opacity:0.7;"/>
+
+            <Button fx:id="btnNuevaReserva"
+                    text="Nueva Reserva"
+                    onAction="#onNuevaReserva"
+                    styleClass="nav-btn" maxWidth="Infinity" prefHeight="44"/>
+
+            <Button fx:id="btnGestionReservas"
+                    text="Gestión de Reservas"
+                    onAction="#onGestionReservas"
+                    styleClass="nav-btn" maxWidth="Infinity" prefHeight="44"/>
+
+            <Button fx:id="btnClientes"
+                    text="Clientes"
+                    onAction="#onClientes"
+                    styleClass="nav-btn" maxWidth="Infinity" prefHeight="44"/>
+
+            <Button fx:id="btnPagos"
+                    text="Pagos"
+                    onAction="#onPagos"
+                    styleClass="nav-btn" maxWidth="Infinity" prefHeight="44"/>
+
+            <!-- Solo visible para ADMIN -->
+            <Button fx:id="btnGestionEmpleados"
+                    text="Camareros"
+                    onAction="#onGestionEmpleados"
+                    styleClass="nav-btn" maxWidth="Infinity" prefHeight="44"
+                    style="-fx-text-fill:#FFC107;"/>
+
+            <!-- Dashboard estadísticas — solo ADMIN -->
+            <Button fx:id="btnDashboard"
+                    text="Estadísticas"
+                    onAction="#onDashboard"
+                    styleClass="nav-btn" maxWidth="Infinity" prefHeight="44"
+                    style="-fx-text-fill:#00C6FF;"/>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <Separator style="-fx-background-color:#3D2E8A; -fx-opacity:0.7;"/>
+            <Button text="Cerrar sesión"
+                    onAction="#onCerrarSesion"
+                    styleClass="btn-secundario" maxWidth="Infinity" prefHeight="38"/>
+        </VBox>
+    </left>
+    <center>
+        <StackPane styleClass="panel-central">
+            <Label text="Selecciona una opción del menú lateral"
+                   styleClass="label-placeholder"/>
+        </StackPane>
+    </center>
+</BorderPane>

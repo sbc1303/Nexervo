@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<SplitPane dividerPositions="0.46" stylesheets="@/Estilo.css"
+           xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.nexervo.controlador.ReservaControlador">
+
+    <ScrollPane fitToWidth="true" style="-fx-background-color:transparent;-fx-background:transparent;">
+        <VBox spacing="12">
+            <padding><Insets top="24" right="24" bottom="24" left="24"/></padding>
+            <Label text="NUEVA RESERVA" styleClass="titulo-seccion"/>
+            <HBox spacing="12">
+                <VBox spacing="4" HBox.hgrow="ALWAYS"><Label text="Nombre *"/>
+                    <TextField fx:id="txtNombre" promptText="Nombre" maxWidth="Infinity"/></VBox>
+                <VBox spacing="4" HBox.hgrow="ALWAYS"><Label text="Apellidos *"/>
+                    <TextField fx:id="txtApellidos" promptText="Apellidos" maxWidth="Infinity"/></VBox>
+            </HBox>
+            <HBox spacing="12">
+                <VBox spacing="4" HBox.hgrow="ALWAYS"><Label text="Teléfono *"/>
+                    <TextField fx:id="txtTelefono" promptText="600000000" maxWidth="Infinity"/></VBox>
+                <VBox spacing="4" HBox.hgrow="ALWAYS"><Label text="Email"/>
+                    <TextField fx:id="txtEmail" promptText="correo@ejemplo.com" maxWidth="Infinity"/></VBox>
+            </HBox>
+            <HBox spacing="12">
+                <VBox spacing="4" HBox.hgrow="ALWAYS"><Label text="Comensales *"/>
+                    <Spinner fx:id="spinnerComensales" editable="true" maxWidth="Infinity"/></VBox>
+                <VBox spacing="4" HBox.hgrow="ALWAYS"><Label text="Fecha *"/>
+                    <DatePicker fx:id="fechaReserva" maxWidth="Infinity"/></VBox>
+            </HBox>
+            <VBox spacing="4"><Label text="Turno y hora *"/>
+                <ComboBox fx:id="comboHora" maxWidth="Infinity" promptText="Selecciona primero una fecha..."/></VBox>
+            <VBox spacing="4"><Label text="Mesa seleccionada *"/>
+                <TextField fx:id="txtMesaSeleccionada" editable="false" styleClass="campo-readonly"
+                           promptText="Haz clic en una mesa del mapa &#x2192;"/>
+                <Label fx:id="lblInfoMesa" styleClass="label-info-mesa" wrapText="true"/></VBox>
+
+            <!-- Alérgenos UE -->
+            <VBox spacing="4">
+                <Label text="Alergias / Intolerancias"/>
+                <Label text="Incluye los 14 alérgenos de declaración obligatoria — Reglamento (UE) 1169/2011"
+                       styleClass="subtitulo" wrapText="true"/>
+                <ListView fx:id="listaAlergias" prefHeight="130"/>
+                <Label fx:id="lblAlergias" styleClass="label-alergias"
+                       text="Ninguna seleccionada" wrapText="true"/>
+            </VBox>
+
+            <!-- Ocasión especial -->
+            <VBox spacing="4">
+                <Label text="Ocasión especial"/>
+                <ComboBox fx:id="comboOcasion" maxWidth="Infinity"/>
+            </VBox>
+
+            <!-- Peticiones especiales -->
+            <VBox spacing="4">
+                <Label text="Peticiones especiales"/>
+                <Label text="Silla bebé, acceso PMR, decoración, tarta sorpresa..."
+                       styleClass="subtitulo"/>
+                <TextArea fx:id="txtPeticiones" prefHeight="50" wrapText="true"
+                          promptText="Indicaciones para sala y cocina..."/>
+            </VBox>
+
+            <VBox spacing="4"><Label text="Observaciones"/>
+                <TextArea fx:id="txtObservaciones" prefHeight="55" wrapText="true"
+                          promptText="Notas adicionales..."/></VBox>
+            <HBox alignment="CENTER_LEFT" spacing="12">
+                <padding><Insets top="8"/></padding>
+                <Button text="CONFIRMAR RESERVA" onAction="#onConfirmar"
+                        styleClass="btn-primario" prefHeight="44" prefWidth="210"/>
+                <Button text="Limpiar" onAction="#onLimpiar"
+                        styleClass="btn-secundario" prefHeight="44"/>
+            </HBox>
+        </VBox>
+    </ScrollPane>
+
+    <VBox spacing="12">
+        <padding><Insets top="24" right="24" bottom="24" left="20"/></padding>
+        <Label text="MAPA DE SALA" styleClass="titulo-seccion"/>
+        <HBox spacing="20" alignment="CENTER_LEFT">
+            <Label text="&#x25CF; LIBRE"   styleClass="leyenda-libre"/>
+            <Label text="&#x25CF; OCUPADA" styleClass="leyenda-ocupada"/>
+            <Label text="&#x25CF; ELEGIDA" styleClass="leyenda-elegida"/>
+        </HBox>
+        <Label fx:id="lblEstadoMapa" styleClass="label-estado-mapa" wrapText="true"/>
+        <FlowPane fx:id="flowMapa" hgap="10" vgap="10" visible="false" VBox.vgrow="ALWAYS"/>
+    </VBox>
+
+</SplitPane>

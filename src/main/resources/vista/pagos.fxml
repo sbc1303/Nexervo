@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<!--
+    FIX 4: Lógica de botones corregida.
+
+    La preautorización funciona como garantía anti no se presentó:
+      · Se retienen 10€/persona al reservar (no se cobra)
+      · Si el cliente VIENE    → pulsar "DEVOLVER" → se libera la retención
+      · Si el cliente NO VIENE → pulsar "COBRAR"   → se captura el importe como penalización
+-->
+<SplitPane dividerPositions="0.55" stylesheets="@/Estilo.css"
+           xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.nexervo.controlador.PagosControlador">
+
+    <!-- IZQUIERDA: Tabla -->
+    <VBox spacing="12">
+        <padding><Insets top="24" right="16" bottom="24" left="24"/></padding>
+        <Label text="MÓDULO DE PAGOS" styleClass="titulo-seccion"/>
+        <Label text="Preautorizaciones · Solo administrador" styleClass="subtitulo"/>
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Label text="Fecha:"/>
+            <DatePicker fx:id="datePagos" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+            <Button text="Cargar" onAction="#onCargar"
+                    styleClass="btn-secundario" prefHeight="34" prefWidth="80"/>
+        </HBox>
+        <TableView fx:id="tabla" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="colCliente"   text="Cliente"  prefWidth="150"/>
+                <TableColumn fx:id="colMesa"       text="Mesa"     prefWidth="55"/>
+                <TableColumn fx:id="colHora"       text="Hora"     prefWidth="65"/>
+                <TableColumn fx:id="colPax"        text="Pax"      prefWidth="40"/>
+                <TableColumn fx:id="colEstadoPago" text="Pago"     prefWidth="100"/>
+            </columns>
+            <placeholder>
+                <Label text="Selecciona fecha y pulsa Cargar"
+                       styleClass="label-placeholder"/>
+            </placeholder>
+        </TableView>
+        <HBox spacing="16">
+            <Label text="● PENDIENTE"  styleClass="leyenda-pendiente"/>
+            <Label text="● COBRADO"    styleClass="leyenda-autorizada"/>
+            <Label text="● DEVUELTO"   styleClass="leyenda-devuelta"/>
+        </HBox>
+    </VBox>
+
+    <!-- DERECHA: Detalle -->
+    <VBox spacing="14">
+        <padding><Insets top="24" right="24" bottom="24" left="16"/></padding>
+
+        <Label text="PREAUTORIZACIÓN" styleClass="titulo-seccion"/>
+
+        <GridPane hgap="12" vgap="10">
+            <Label text="Cliente:"  styleClass="label-campo"
+                   GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+            <Label fx:id="lblPagoCliente" text="—" styleClass="label-valor"
+                   GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+            <Label text="Importe:"  styleClass="label-campo"
+                   GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+            <Label fx:id="lblPagoImporte" text="—" styleClass="label-valor-grande"
+                   GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+            <Label text="Estado:"   styleClass="label-campo"
+                   GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+            <Label fx:id="lblPagoEstado" text="—" styleClass="label-valor"
+                   GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+            <Label text="Creada:"   styleClass="label-campo"
+                   GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+            <Label fx:id="lblPagoFecha" text="—" styleClass="label-valor"
+                   GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+            <columnConstraints>
+                <ColumnConstraints minWidth="90" prefWidth="100"/>
+                <ColumnConstraints hgrow="ALWAYS"/>
+            </columnConstraints>
+        </GridPane>
+
+        <Separator/>
+
+        <!-- Explicación de la lógica -->
+        <VBox styleClass="panel-info" spacing="6">
+            <padding><Insets top="10" right="12" bottom="10" left="12"/></padding>
+            <Label text="Cómo funciona:" styleClass="label-campo"/>
+            <Label wrapText="true" styleClass="label-pie"
+                   text="Al reservar se retienen 10€/persona. Si el cliente VIENE se le devuelve. Si NO VIENE se le cobra como penalización."/>
+        </VBox>
+
+        <Separator/>
+
+        <VBox spacing="10">
+            <!--
+                FIX 4: DEVOLVER = cliente se presentó → liberar retención (no cobrar)
+            -->
+            <Button fx:id="btnDevolver"
+                    text="Cliente se presentó — Devolver retención"
+                    onAction="#onDevolver"
+                    styleClass="btn-primario" maxWidth="Infinity" prefHeight="44"
+                    disable="true"/>
+
+            <!--
+                FIX 4: COBRAR = no se presentó → capturar el importe como penalización
+            -->
+            <Button fx:id="btnCobrar"
+                    text="No se presentó — Cobrar penalización"
+                    onAction="#onCobrar"
+                    styleClass="btn-peligro" maxWidth="Infinity" prefHeight="44"
+                    disable="true"/>
+        </VBox>
+
+        <Region VBox.vgrow="ALWAYS"/>
+
+        <Label text="SIMULACIÓN · No se realizan cargos reales.\nVer memoria técnica, sección 2.3.2."
+               styleClass="label-pie" wrapText="true"/>
+    </VBox>
+
+</SplitPane>

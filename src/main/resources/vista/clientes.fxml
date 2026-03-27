@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<!--
+    Vista Clientes v3
+    Novedades:
+    · Panel de historial de reservas del cliente (visitas, no se presentós, gasto estimado)
+    · KPIs de cliente: visitas totales, no se presentós, gasto acumulado
+-->
+<SplitPane dividerPositions="0.42" stylesheets="@/Estilo.css"
+           xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.nexervo.controlador.ClientesControlador">
+
+    <!-- ═══ IZQUIERDA: Lista ═══ -->
+    <VBox spacing="12">
+        <padding><Insets top="24" right="16" bottom="24" left="24"/></padding>
+
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <Label text="CLIENTES" styleClass="titulo-seccion" HBox.hgrow="ALWAYS"
+                   style="-fx-max-width: Infinity;"/>
+            <Button text="+ Nuevo" onAction="#onNuevo"
+                    styleClass="btn-secundario" prefHeight="30" prefWidth="80"/>
+        </HBox>
+
+        <TextField fx:id="txtBuscar"
+                   promptText="Buscar por nombre, teléfono o email..."
+                   maxWidth="Infinity"/>
+
+        <TableView fx:id="tabla" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="colNombre"   text="Nombre"   prefWidth="170"/>
+                <TableColumn fx:id="colTelefono" text="Teléfono" prefWidth="100"/>
+                <TableColumn fx:id="colEmail"    text="Email"    prefWidth="160"/>
+            </columns>
+            <placeholder>
+                <Label text="No se encontraron clientes" styleClass="label-placeholder"/>
+            </placeholder>
+        </TableView>
+    </VBox>
+
+    <!-- ═══ DERECHA: Detalle / Creación ═══ -->
+    <ScrollPane fitToWidth="true"
+                style="-fx-background-color:transparent; -fx-background:transparent;">
+        <VBox spacing="12">
+            <padding><Insets top="24" right="24" bottom="24" left="16"/></padding>
+
+            <Label fx:id="lblTituloPanel" text="DATOS DEL CLIENTE" styleClass="titulo-seccion"/>
+
+            <VBox spacing="4">
+                <Label text="Nombre completo *"/>
+                <TextField fx:id="txtNombreEdit" maxWidth="Infinity" disable="true"/>
+            </VBox>
+            <VBox spacing="4">
+                <Label text="Teléfono *"/>
+                <TextField fx:id="txtTelefonoEdit" maxWidth="Infinity" disable="true"/>
+            </VBox>
+            <VBox spacing="4">
+                <Label text="Email"/>
+                <TextField fx:id="txtEmailEdit" maxWidth="Infinity" disable="true"/>
+            </VBox>
+            <VBox spacing="4">
+                <Label text="Observaciones internas"/>
+                <TextArea fx:id="txtObsEdit" prefHeight="60" wrapText="true" disable="true"/>
+            </VBox>
+
+            <Separator/>
+
+            <!-- Intolerancias -->
+            <VBox fx:id="vboxIntol" spacing="6" disable="true">
+                <Label text="Alergias / Intolerancias (Reg. UE 1169/2011):" styleClass="label-campo"/>
+                <ListView fx:id="listaIntol" prefHeight="155"/>
+                <Label fx:id="lblResumenIntol" styleClass="label-alergias"
+                       text="Ninguna seleccionada" wrapText="true" maxWidth="Infinity"/>
+            </VBox>
+
+            <Separator/>
+
+            <VBox spacing="8">
+                <Button fx:id="btnGuardar" text="Guardar cambios" onAction="#onGuardar"
+                        styleClass="btn-primario" maxWidth="Infinity" prefHeight="40" disable="true"/>
+                <Button fx:id="btnCancelar" text="Cancelar" onAction="#onCancelar"
+                        styleClass="btn-secundario" maxWidth="Infinity" prefHeight="36"
+                        visible="false" managed="false"/>
+                <Button fx:id="btnEliminar" text="Eliminar cliente (ADMIN)" onAction="#onEliminar"
+                        styleClass="btn-peligro" maxWidth="Infinity" prefHeight="40" disable="true"/>
+            </VBox>
+
+            <!-- ── HISTORIAL DE VISITAS ── -->
+            <Separator/>
+
+            <VBox fx:id="panelHistorial" spacing="8" visible="false" managed="false">
+                <Label text="HISTORIAL DE VISITAS" styleClass="titulo-seccion"
+                       style="-fx-font-size:13px;"/>
+
+                <!-- KPIs del cliente -->
+                <HBox spacing="10">
+                    <VBox styleClass="kpi-mini" HBox.hgrow="ALWAYS" alignment="CENTER" spacing="2">
+                        <padding><Insets top="8" right="8" bottom="8" left="8"/></padding>
+                        <Label text="VISITAS" styleClass="kpi-titulo"
+                               style="-fx-font-size:10px;"/>
+                        <Label fx:id="lblVisitas" text="0" styleClass="kpi-valor"
+                               style="-fx-font-size:22px;"/>
+                    </VBox>
+                    <VBox styleClass="kpi-mini" HBox.hgrow="ALWAYS" alignment="CENTER" spacing="2">
+                        <padding><Insets top="8" right="8" bottom="8" left="8"/></padding>
+                        <Label text="AUSENCIAS" styleClass="kpi-titulo"
+                               style="-fx-font-size:10px;"/>
+                        <Label fx:id="lblAusenciasCliente" text="0" styleClass="kpi-valor-alerta"
+                               style="-fx-font-size:22px;"/>
+                    </VBox>
+                    <VBox styleClass="kpi-mini" HBox.hgrow="ALWAYS" alignment="CENTER" spacing="2">
+                        <padding><Insets top="8" right="8" bottom="8" left="8"/></padding>
+                        <Label text="GASTO EST." styleClass="kpi-titulo"
+                               style="-fx-font-size:10px;"/>
+                        <Label fx:id="lblGastoEstimado" text="0 €" styleClass="kpi-valor"
+                               style="-fx-font-size:18px;"/>
+                    </VBox>
+                </HBox>
+
+                <!-- Tabla de historial -->
+                <TableView fx:id="tablaHistorial" prefHeight="160">
+                    <columns>
+                        <TableColumn fx:id="colHistFecha"   text="Fecha"   prefWidth="90"/>
+                        <TableColumn fx:id="colHistMesa"    text="Mesa"    prefWidth="55"/>
+                        <TableColumn fx:id="colHistPax"     text="Pax"     prefWidth="40"/>
+                        <TableColumn fx:id="colHistOcasion" text="Ocasión" prefWidth="90"/>
+                        <TableColumn fx:id="colHistEstado"  text="Estado"  prefWidth="90"/>
+                    </columns>
+                    <placeholder>
+                        <Label text="Sin historial de visitas" styleClass="label-placeholder"/>
+                    </placeholder>
+                </TableView>
+            </VBox>
+
+        </VBox>
+    </ScrollPane>
+
+</SplitPane>

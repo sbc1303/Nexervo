@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<HBox styleClass="root-login" stylesheets="@/Estilo.css"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.nexervo.controlador.LoginControlador">
+
+    <!-- ── COLUMNA IZQUIERDA: Branding ── -->
+    <VBox alignment="CENTER" HBox.hgrow="ALWAYS" spacing="28"
+          style="-fx-background-color: rgba(8, 4, 28, 0.45);">
+        <padding><Insets top="60" right="60" bottom="60" left="60"/></padding>
+
+        <ImageView fitHeight="90" fitWidth="290" preserveRatio="true" pickOnBounds="true" smooth="true">
+            <image><Image url="@/img/logo_fondo_oscuro.png"/></image>
+        </ImageView>
+
+        <Label text="Software para la gestión de reservas en hostelería"
+               styleClass="subtitulo" alignment="CENTER" wrapText="true"
+               style="-fx-font-size:14px;"/>
+
+        <Separator style="-fx-background-color:#3D2E8A; -fx-padding: 0 0 10 0;"/>
+
+        <VBox spacing="18">
+            <HBox spacing="14" alignment="CENTER_LEFT">
+                <Label text="·" style="-fx-text-fill:#00E676; -fx-font-size:16px; -fx-font-weight:bold;"/>
+                <Label text="Reservas en tiempo real" style="-fx-text-fill:#C0C0E0; -fx-font-size:13px;"/>
+            </HBox>
+            <HBox spacing="14" alignment="CENTER_LEFT">
+                <Label text="·" style="-fx-text-fill:#00E676; -fx-font-size:16px; -fx-font-weight:bold;"/>
+                <Label text="Gestión de mesas y disponibilidad" style="-fx-text-fill:#C0C0E0; -fx-font-size:13px;"/>
+            </HBox>
+            <HBox spacing="14" alignment="CENTER_LEFT">
+                <Label text="·" style="-fx-text-fill:#00E676; -fx-font-size:16px; -fx-font-weight:bold;"/>
+                <Label text="Control de pagos y preautorizaciones" style="-fx-text-fill:#C0C0E0; -fx-font-size:13px;"/>
+            </HBox>
+            <HBox spacing="14" alignment="CENTER_LEFT">
+                <Label text="·" style="-fx-text-fill:#00E676; -fx-font-size:16px; -fx-font-weight:bold;"/>
+                <Label text="Acceso de clientes sin contraseña" style="-fx-text-fill:#C0C0E0; -fx-font-size:13px;"/>
+            </HBox>
+        </VBox>
+
+        <Label text="NEXERVO © 2026" styleClass="label-pie"
+               style="-fx-padding: 30 0 0 0;"/>
+    </VBox>
+
+    <!-- ── Separador vertical ── -->
+    <Separator orientation="VERTICAL"
+               style="-fx-background-color:#3D2E8A; -fx-pref-width:1;"/>
+
+    <!-- ── COLUMNA DERECHA: Formulario ── -->
+    <VBox alignment="CENTER" HBox.hgrow="ALWAYS" spacing="0"
+          style="-fx-background-color: rgba(6, 3, 22, 0.6);">
+        <padding><Insets top="60" right="70" bottom="60" left="70"/></padding>
+
+        <VBox spacing="0" maxWidth="380" style="-fx-alignment:center;">
+
+            <Label text="Bienvenido de nuevo"
+                   style="-fx-text-fill:#E8E8F0; -fx-font-size:22px; -fx-font-weight:bold; -fx-padding: 0 0 4 0;"/>
+            <Label text="Accede a tu panel de gestión"
+                   styleClass="subtitulo" style="-fx-padding: 0 0 28 0;"/>
+
+            <!-- Separador personal -->
+            <HBox alignment="CENTER" spacing="10" style="-fx-padding: 0 0 18 0;">
+                <Separator HBox.hgrow="ALWAYS"/>
+                <Label text="ACCESO PERSONAL"
+                       style="-fx-text-fill:#5D3FD3; -fx-font-size:10px; -fx-font-weight:bold;"/>
+                <Separator HBox.hgrow="ALWAYS"/>
+            </HBox>
+
+            <VBox spacing="6" style="-fx-padding: 0 0 10 0;">
+                <Label text="Usuario"/>
+                <TextField fx:id="txtUsuario" promptText="nombre de usuario" maxWidth="Infinity"/>
+            </VBox>
+
+            <VBox spacing="6" style="-fx-padding: 0 0 14 0;">
+                <Label text="Contraseña"/>
+                <PasswordField fx:id="txtContrasena" promptText="contraseña" maxWidth="Infinity"/>
+            </VBox>
+
+            <Label fx:id="lblError" styleClass="label-error" wrapText="true"
+                   maxWidth="Infinity" visible="false" style="-fx-padding: 0 0 8 0;"/>
+
+            <Button fx:id="btnEntrar" text="ENTRAR AL SISTEMA"
+                    onAction="#onEntrarClick"
+                    styleClass="btn-primario" maxWidth="Infinity" prefHeight="44"/>
+
+            <!-- Separador cliente -->
+            <HBox alignment="CENTER" spacing="10" style="-fx-padding: 28 0 18 0;">
+                <Separator HBox.hgrow="ALWAYS"/>
+                <Label text="ACCESO CLIENTE"
+                       style="-fx-text-fill:#00C6FF; -fx-font-size:10px; -fx-font-weight:bold;"/>
+                <Separator HBox.hgrow="ALWAYS"/>
+            </HBox>
+
+            <Button fx:id="btnCliente" text="Reservar una mesa  →"
+                    onAction="#onAccesoClienteClick"
+                    styleClass="btn-secundario" maxWidth="Infinity" prefHeight="44"
+                    style="-fx-border-color:#00C6FF; -fx-text-fill:#00C6FF; -fx-font-size:13px;"/>
+
+            <Label text="Sin contraseña · Reserva y gestiona tus citas"
+                   styleClass="label-pie" alignment="CENTER"
+                   style="-fx-padding: 8 0 0 0;"/>
+        </VBox>
+    </VBox>
+
+</HBox>
