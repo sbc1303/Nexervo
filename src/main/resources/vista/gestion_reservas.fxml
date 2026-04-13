@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<!--
+    Gestión de Reservas — v3
+    Novedades:
+    · Campo "Ocasión" para registrar cumpleaños, aniversarios, etc.
+    · Campo "Peticiones especiales" (silla bebé, acceso PMR, decoración)
+    · Botón "No se presentó" para registrar no presentaciones
+    · Botón "Hoja del día" genera el parte de sala para cocina
+-->
+<SplitPane dividerPositions="0.42" stylesheets="@/Estilo.css"
+           xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.nexervo.controlador.GestionReservasControlador">
+
+    <!-- IZQUIERDA: Tabla + herramientas -->
+    <VBox spacing="12">
+        <padding><Insets top="24" right="16" bottom="24" left="24"/></padding>
+        <Label text="GESTIÓN DE RESERVAS" styleClass="titulo-seccion"/>
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Label text="Fecha:"/>
+            <DatePicker fx:id="dateBusqueda" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+            <Button text="Buscar"    onAction="#onBuscar"
+                    styleClass="btn-secundario" prefHeight="34" prefWidth="80"/>
+            <Button text="↺" onAction="#onBuscar"
+                    styleClass="btn-secundario" prefHeight="34" prefWidth="36"
+                    style="-fx-font-size:14px;"/>
+            <Button text="Hoja del día" onAction="#onHojaDelDia"
+                    styleClass="btn-secundario" prefHeight="34"
+                    style="-fx-text-fill:#00C6FF;"/>
+        </HBox>
+        <TableView fx:id="tabla" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="colHora"       text="Hora"    prefWidth="60"/>
+                <TableColumn fx:id="colMesa"        text="Mesa"    prefWidth="55"/>
+                <TableColumn fx:id="colCliente"     text="Cliente" prefWidth="135"/>
+                <TableColumn fx:id="colComensales"  text="Pax"     prefWidth="38"/>
+                <TableColumn fx:id="colOcasion"     text="Ocasión" prefWidth="90"/>
+                <TableColumn fx:id="colEstado"      text="Estado"  prefWidth="85"/>
+            </columns>
+            <placeholder>
+                <Label text="No hay reservas para esta fecha"
+                       styleClass="label-placeholder"/>
+            </placeholder>
+        </TableView>
+    </VBox>
+
+    <!-- DERECHA: Detalle editable -->
+    <StackPane style="-fx-background-color:transparent;">
+
+        <VBox fx:id="panelPlaceholder" alignment="CENTER" spacing="16">
+            <Label text="&#x2190;" style="-fx-font-size:40px; -fx-text-fill:#3D2E8A;"/>
+            <Label text="Selecciona una reserva" style="-fx-font-size:15px; -fx-text-fill:#5D5D8A; -fx-font-weight:bold;"/>
+            <Label text="para ver el detalle y editar" styleClass="subtitulo"/>
+        </VBox>
+
+        <ScrollPane fitToWidth="true"
+                    style="-fx-background-color:transparent;-fx-background:transparent;">
+        <VBox fx:id="panelDetalle" spacing="10">
+            <padding><Insets top="20" right="20" bottom="20" left="16"/></padding>
+
+            <Label text="DETALLE Y EDICIÓN" styleClass="titulo-seccion"/>
+            <Label fx:id="lblCliente" styleClass="label-dorado" wrapText="true"/>
+
+            <!-- Alerta alérgenos -->
+            <VBox fx:id="panelAlerta" styleClass="panel-alerta" spacing="4">
+                <padding><Insets top="8" right="12" bottom="8" left="12"/></padding>
+                <Label fx:id="lblAlerta" styleClass="label-alerta" wrapText="true"/>
+            </VBox>
+
+            <!-- Alerta ocasión especial -->
+            <VBox fx:id="panelOcasionAlerta" styleClass="panel-ocasion"
+                  spacing="4" visible="false" managed="false">
+                <padding><Insets top="8" right="12" bottom="8" left="12"/></padding>
+                <Label fx:id="lblOcasionAlerta" styleClass="label-ocasion" wrapText="true"/>
+            </VBox>
+
+            <Label text="Editar reserva:" styleClass="label-campo"/>
+
+            <HBox spacing="10">
+                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                    <Label text="Fecha"/>
+                    <DatePicker fx:id="editFecha" maxWidth="Infinity"/>
+                </VBox>
+                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                    <Label text="Hora"/>
+                    <ComboBox fx:id="editHora" maxWidth="Infinity"/>
+                </VBox>
+            </HBox>
+
+            <HBox spacing="10">
+                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                    <Label text="Mesa"/>
+                    <ComboBox fx:id="editMesa" maxWidth="Infinity"/>
+                </VBox>
+                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                    <Label text="Comensales"/>
+                    <Spinner fx:id="editComensales" editable="true" maxWidth="Infinity"/>
+                </VBox>
+            </HBox>
+
+            <VBox spacing="4">
+                <Label text="Ocasión especial"/>
+                <ComboBox fx:id="editOcasion" maxWidth="Infinity"/>
+            </VBox>
+
+            <VBox spacing="4">
+                <Label text="Peticiones especiales"/>
+                <Label text="Silla bebé, acceso PMR, decoración, tarta..."
+                       styleClass="subtitulo"/>
+                <TextArea fx:id="editPeticiones" prefHeight="50" wrapText="true"
+                          promptText="Indicaciones especiales para sala y cocina..."/>
+            </VBox>
+
+            <VBox spacing="4">
+                <Label text="Observaciones internas"/>
+                <TextArea fx:id="editObservaciones" prefHeight="50" wrapText="true"/>
+            </VBox>
+
+            <VBox spacing="4">
+                <Label text="Alergias / Intolerancias del cliente"/>
+                <Label text="Los cambios actualizan el perfil del cliente"
+                       styleClass="subtitulo"/>
+                <ListView fx:id="editIntolerancias" prefHeight="110"/>
+            </VBox>
+
+            <Label fx:id="lblEstadoEdit" styleClass="label-pie" wrapText="true"/>
+
+            <Separator/>
+
+            <VBox spacing="8">
+                <Button fx:id="btnGuardar"
+                        text="Guardar cambios"
+                        onAction="#onGuardar"
+                        styleClass="btn-primario" maxWidth="Infinity" prefHeight="40"/>
+                <Button fx:id="btnCancelar"
+                        text="Cancelar reserva"
+                        onAction="#onCancelar"
+                        styleClass="btn-peligro" maxWidth="Infinity" prefHeight="38"/>
+                <Button fx:id="btnNoPresentado"
+                        text="No se presentó"
+                        onAction="#onNoPresentado"
+                        styleClass="btn-no-presentado" maxWidth="Infinity" prefHeight="38"/>
+                <Button fx:id="btnFinalizar"
+                        text="Marcar finalizada"
+                        onAction="#onFinalizar"
+                        styleClass="btn-secundario" maxWidth="Infinity" prefHeight="38"/>
+            </VBox>
+
+        </VBox>
+        </ScrollPane>
+
+    </StackPane>
+
+</SplitPane>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.geometry.Insets?>
+
+<!--
+    Dashboard de Estadísticas — NEXERVO
+    Muestra 4 KPIs rápidos + 4 gráficos que dan al gerente
+    una visión de negocio inmediata:
+      1. Reservas por día de la semana (90 días)
+      2. Franja horaria más demandada
+      3. Top 5 clientes por visitas
+      4. Ingresos estimados por mes (año en curso)
+
+    Diseñado a partir de la experiencia real en sala: las métricas
+    que un maître necesita son disponibilidad, picos de servicio
+    y rentabilidad por cliente.
+-->
+<ScrollPane fitToWidth="true"
+            style="-fx-background-color:transparent;-fx-background:transparent;"
+            stylesheets="@/Estilo.css"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.nexervo.controlador.DashboardControlador">
+
+    <VBox spacing="20">
+        <padding><Insets top="24" right="24" bottom="24" left="24"/></padding>
+
+        <!-- Encabezado -->
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Label text="PANEL DE ESTADÍSTICAS" styleClass="titulo-seccion"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Actualizar" onAction="#onActualizar"
+                    styleClass="btn-secundario" prefHeight="34"/>
+        </HBox>
+
+        <!-- ── KPIs rápidos ── -->
+        <HBox spacing="16">
+            <VBox fx:id="kpiHoy" styleClass="kpi-card" HBox.hgrow="ALWAYS" spacing="4" alignment="CENTER">
+                <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+                <Label text="RESERVAS HOY" styleClass="kpi-titulo"/>
+                <Label fx:id="lblKpiHoy" text="—" styleClass="kpi-valor"/>
+            </VBox>
+            <VBox fx:id="kpiMes" styleClass="kpi-card" HBox.hgrow="ALWAYS" spacing="4" alignment="CENTER">
+                <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+                <Label text="RESERVAS ESTE MES" styleClass="kpi-titulo"/>
+                <Label fx:id="lblKpiMes" text="—" styleClass="kpi-valor"/>
+            </VBox>
+            <VBox fx:id="kpiClientes" styleClass="kpi-card" HBox.hgrow="ALWAYS" spacing="4" alignment="CENTER">
+                <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+                <Label text="CLIENTES REGISTRADOS" styleClass="kpi-titulo"/>
+                <Label fx:id="lblKpiClientes" text="—" styleClass="kpi-valor"/>
+            </VBox>
+            <VBox fx:id="kpiAusencias" styleClass="kpi-card-alerta" HBox.hgrow="ALWAYS" spacing="4" alignment="CENTER">
+                <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+                <Label text="AUSENCIAS ESTE MES" styleClass="kpi-titulo"/>
+                <Label fx:id="lblKpiAusencias" text="—" styleClass="kpi-valor-alerta"/>
+            </VBox>
+        </HBox>
+
+        <!-- ── Fila 1: Días semana + Franjas horarias ── -->
+        <HBox spacing="16">
+            <VBox styleClass="grafico-panel" HBox.hgrow="ALWAYS" spacing="8">
+                <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+                <Label text="Reservas por día de la semana" styleClass="grafico-titulo"/>
+                <Label text="Últimos 90 días · excluye canceladas" styleClass="subtitulo"/>
+                <BarChart fx:id="chartDias"
+                          animated="false"
+                          legendVisible="false"
+                          prefHeight="200"
+                          style="-fx-background-color:transparent;">
+                    <xAxis><CategoryAxis/></xAxis>
+                    <yAxis><NumberAxis/></yAxis>
+                </BarChart>
+            </VBox>
+            <VBox styleClass="grafico-panel" HBox.hgrow="ALWAYS" spacing="8">
+                <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+                <Label text="Franjas horarias más demandadas" styleClass="grafico-titulo"/>
+                <Label text="Últimos 90 días · excluye canceladas" styleClass="subtitulo"/>
+                <BarChart fx:id="chartFranjas"
+                          animated="false"
+                          legendVisible="false"
+                          prefHeight="200"
+                          style="-fx-background-color:transparent;">
+                    <xAxis><CategoryAxis/></xAxis>
+                    <yAxis><NumberAxis/></yAxis>
+                </BarChart>
+            </VBox>
+        </HBox>
+
+        <!-- ── Fila 2: Top clientes + Ingresos por mes ── -->
+        <HBox spacing="16">
+            <VBox styleClass="grafico-panel" HBox.hgrow="ALWAYS" spacing="8">
+                <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+                <Label text="Top 5 clientes más frecuentes" styleClass="grafico-titulo"/>
+                <Label text="Por visitas completadas (FINALIZADA)" styleClass="subtitulo"/>
+                <BarChart fx:id="chartClientes"
+                          animated="false"
+                          legendVisible="false"
+                          prefHeight="220"
+                          style="-fx-background-color:transparent;">
+                    <xAxis><CategoryAxis/></xAxis>
+                    <yAxis><NumberAxis/></yAxis>
+                </BarChart>
+            </VBox>
+            <VBox styleClass="grafico-panel" HBox.hgrow="ALWAYS" spacing="8">
+                <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+                <Label text="Ingresos estimados por mes" styleClass="grafico-titulo"/>
+                <Label text="Año en curso · solo reservas finalizadas · 10€/comensal" styleClass="subtitulo"/>
+                <LineChart fx:id="chartIngresos"
+                           animated="false"
+                           legendVisible="false"
+                           createSymbols="true"
+                           prefHeight="220"
+                           style="-fx-background-color:transparent;">
+                    <xAxis><CategoryAxis/></xAxis>
+                    <yAxis><NumberAxis label="€"/></yAxis>
+                </LineChart>
+            </VBox>
+        </HBox>
+
+        <!-- Nota legal -->
+        <Label text="* Los ingresos son estimaciones basadas en preautorizaciones (10 €/comensal). No representan facturación real."
+               styleClass="label-pie" wrapText="true"/>
+
+    </VBox>
+</ScrollPane>

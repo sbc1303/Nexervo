@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.example</groupId>
+    <artifactId>Nexervo</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <javafx.version>21.0.2</javafx.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>8.3.0</version>
+        </dependency>
+
+        <!-- Jakarta Mail — envío de email de confirmación de reserva -->
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>jakarta.mail</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+
+        <!-- H2 — base de datos en memoria para tests de integración de DAOs -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>2.2.224</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Apache PDFBox — generación del PDF de la hoja del día -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.10.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Mockito — tests unitarios con mocks para simular fallos de BD -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>5.11.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- SLF4J + Logback — logging real en lugar de System.err.println -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.12</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.5.3</version>
+        </dependency>
+
+        <!-- Gson — serialización JSON para la API REST embebida.
+             Se elige Gson sobre Jackson por ser más ligero y sin dependencias transitivas.
+             Usamos adaptadores propios para LocalDate / LocalTime (java.time). -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+            </plugin>
+
+            <!-- maven-surefire: pasa el flag experimental de Byte Buddy para que
+                 Mockito funcione con Java 23+. Byte Buddy 1.14 (incluido en
+                 Mockito 5.11) solo soporta hasta Java 22 de forma oficial; con
+                 net.bytebuddy.experimental=true funciona en versiones superiores.
+                 El @{argLine} hereda los argumentos que JaCoCo inyecta en prepare-agent. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
+                    <argLine>@{argLine} -Dnet.bytebuddy.experimental=true</argLine>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.8</version>
+                <configuration>
+                    <mainClass>com.nexervo.Launcher</mainClass>
+                </configuration>
+            </plugin>
+
+            <!-- JaCoCo — cobertura de tests, genera informe en target/site/jacoco -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.11</version>
+                <executions>
+                    <execution>
+                        <goals><goal>prepare-agent</goal></goals>
+                    </execution>
+                    <execution>
+                        <id>jacoco-report</id>
+                        <phase>test</phase>
+                        <goals><goal>report</goal></goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals><goal>shade</goal></goals>
+                        <configuration>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.nexervo.Launcher</mainClass>
+                                </transformer>
+                                <!-- necesario para que SLF4J funcione en el fat-jar -->
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                            </transformers>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <!-- Perfiles para generar instaladores nativos con jpackage (incluido en el JDK 14+).
+         Uso maven-antrun para llamar a jpackage directamente — intenté con el plugin
+         org.panteleyev:jpackage-maven-plugin pero daba problemas con el fat-jar del shade.
+         Con antrun funciona aunque es un poco más verbose.
+           mvn package -Ppackage-windows  →  .exe
+           mvn package -Ppackage-mac      →  .dmg
+           mvn package -Ppackage-linux    →  .deb
+         (hay que hacer mvn package primero para que exista el fat-jar) -->
+    <profiles>
+
+        <!-- ─── Windows ─── -->
+        <profile>
+            <id>package-windows</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <executions>
+                            <execution>
+                                <id>jpackage-windows</id>
+                                <phase>package</phase>
+                                <goals><goal>run</goal></goals>
+                                <configuration>
+                                    <target>
+                                        <exec executable="jpackage" failonerror="true">
+                                            <arg value="--input"/>           <arg value="${project.build.directory}"/>
+                                            <arg value="--name"/>            <arg value="NEXERVO"/>
+                                            <arg value="--main-jar"/>        <arg value="${project.artifactId}-${project.version}.jar"/>
+                                            <arg value="--main-class"/>      <arg value="com.nexervo.Launcher"/>
+                                            <arg value="--type"/>            <arg value="exe"/>
+                                            <arg value="--win-menu"/>
+                                            <arg value="--win-shortcut"/>
+                                            <arg value="--dest"/>            <arg value="${project.build.directory}/installer"/>
+                                            <arg value="--app-version"/>     <arg value="1.0"/>
+                                            <arg value="--vendor"/>          <arg value="Nexervo TFC"/>
+                                            <arg value="--description"/>     <arg value="Sistema de gestión de reservas para restaurante"/>
+                                        </exec>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- ─── macOS ─── -->
+        <profile>
+            <id>package-mac</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <executions>
+                            <execution>
+                                <id>jpackage-mac</id>
+                                <phase>package</phase>
+                                <goals><goal>run</goal></goals>
+                                <configuration>
+                                    <target>
+                                        <exec executable="jpackage" failonerror="true">
+                                            <arg value="--input"/>           <arg value="${project.build.directory}"/>
+                                            <arg value="--name"/>            <arg value="NEXERVO"/>
+                                            <arg value="--main-jar"/>        <arg value="${project.artifactId}-${project.version}.jar"/>
+                                            <arg value="--main-class"/>      <arg value="com.nexervo.Launcher"/>
+                                            <arg value="--type"/>            <arg value="dmg"/>
+                                            <arg value="--dest"/>            <arg value="${project.build.directory}/installer"/>
+                                            <arg value="--app-version"/>     <arg value="1.0"/>
+                                            <arg value="--vendor"/>          <arg value="Nexervo TFC"/>
+                                        </exec>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- ─── Linux ─── -->
+        <profile>
+            <id>package-linux</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <executions>
+                            <execution>
+                                <id>jpackage-linux</id>
+                                <phase>package</phase>
+                                <goals><goal>run</goal></goals>
+                                <configuration>
+                                    <target>
+                                        <exec executable="jpackage" failonerror="true">
+                                            <arg value="--input"/>           <arg value="${project.build.directory}"/>
+                                            <arg value="--name"/>            <arg value="NEXERVO"/>
+                                            <arg value="--main-jar"/>        <arg value="${project.artifactId}-${project.version}.jar"/>
+                                            <arg value="--main-class"/>      <arg value="com.nexervo.Launcher"/>
+                                            <arg value="--type"/>            <arg value="deb"/>
+                                            <arg value="--dest"/>            <arg value="${project.build.directory}/installer"/>
+                                            <arg value="--app-version"/>     <arg value="1.0"/>
+                                            <arg value="--vendor"/>          <arg value="Nexervo TFC"/>
+                                            <arg value="--linux-menu-group"/> <arg value="Office"/>
+                                            <arg value="--linux-shortcut"/>
+                                        </exec>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- Gluon Mobile — configuración base para compilar a Android con GraalVM.
+             Lo investigué como línea futura pero no he llegado a probarlo en un
+             dispositivo real — requiere GraalVM 22+ con native-image y el Android SDK.
+             La idea es que la app móvil consumiría la misma API REST que ya expone
+             ApiServer, así que la lógica de negocio no habría que tocarla. -->
+        <profile>
+            <id>mobile</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.gluonhq</groupId>
+                        <artifactId>gluonfx-maven-plugin</artifactId>
+                        <version>1.0.22</version>
+                        <configuration>
+                            <mainClass>com.nexervo.Launcher</mainClass>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+            <repositories>
+                <repository>
+                    <id>gluon</id>
+                    <url>https://nexus.gluonhq.com/nexus/content/repositories/releases/</url>
+                </repository>
+            </repositories>
+        </profile>
+
+    </profiles>
+
+</project>

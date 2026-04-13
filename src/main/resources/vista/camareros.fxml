@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<SplitPane dividerPositions="0.42" stylesheets="@/Estilo.css"
+           xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.nexervo.controlador.CamarerosControlador">
+
+    <!-- IZQUIERDA: Tabla de empleados -->
+    <VBox spacing="12">
+        <padding><Insets top="24" right="16" bottom="24" left="24"/></padding>
+
+        <Label text="GESTIÓN DE CAMAREROS" styleClass="titulo-seccion"/>
+
+        <!-- Buscador + botón nuevo -->
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <TextField fx:id="txtBuscar" promptText="Buscar por nombre o usuario…"
+                       HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+            <Button text="Nuevo"
+                    onAction="#onNuevo"
+                    styleClass="btn-primario" prefHeight="34"/>
+        </HBox>
+
+        <!-- Filtro de rol -->
+        <HBox spacing="8" alignment="CENTER_LEFT">
+            <Label text="Filtrar:" styleClass="label-campo"/>
+            <ToggleButton fx:id="filtroTodos"     text="Todos"    onAction="#onFiltrar" selected="true" prefWidth="72"/>
+            <ToggleButton fx:id="filtroEmpleados" text="Empleados" onAction="#onFiltrar" prefWidth="88"/>
+            <ToggleButton fx:id="filtroAdmins"    text="Admins"   onAction="#onFiltrar" prefWidth="72"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="lblContador" styleClass="subtitulo"/>
+        </HBox>
+
+        <TableView fx:id="tabla" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="colNombre"   text="Nombre completo" prefWidth="160"/>
+                <TableColumn fx:id="colUsuario"  text="Usuario"         prefWidth="110"/>
+                <TableColumn fx:id="colRol"      text="Rol"             prefWidth="80"/>
+                <TableColumn fx:id="colActivo"   text="Estado"          prefWidth="72"/>
+            </columns>
+            <placeholder>
+                <Label text="No hay empleados registrados"
+                       styleClass="label-placeholder"/>
+            </placeholder>
+        </TableView>
+    </VBox>
+
+    <!-- DERECHA: Detalle / formulario -->
+    <StackPane style="-fx-background-color:transparent;">
+
+        <!-- Placeholder cuando no hay nada seleccionado -->
+        <VBox fx:id="panelPlaceholder" alignment="CENTER" spacing="16">
+            <Label text="←" style="-fx-font-size:40px; -fx-text-fill:#3D2E8A;"/>
+            <Label text="Selecciona un camarero" style="-fx-font-size:15px; -fx-text-fill:#5D5D8A; -fx-font-weight:bold;"/>
+            <Label text="o pulsa «Nuevo» para crear uno" styleClass="subtitulo"/>
+        </VBox>
+
+        <!-- Panel de detalle/edición -->
+        <ScrollPane fx:id="scrollDetalle" fitToWidth="true"
+                    style="-fx-background-color:transparent;-fx-background:transparent;"
+                    visible="false" managed="false">
+
+            <VBox fx:id="panelDetalle" spacing="10">
+                <padding><Insets top="20" right="20" bottom="20" left="16"/></padding>
+
+                <Label fx:id="lblTituloForm" styleClass="titulo-seccion"/>
+                <Label fx:id="lblIdUsuario" visible="false" managed="false"/>
+
+                <!-- Nombre completo -->
+                <VBox spacing="4">
+                    <Label text="Nombre completo" styleClass="label-campo"/>
+                    <TextField fx:id="txtNombre" promptText="Ej: María García López" maxWidth="Infinity"/>
+                </VBox>
+
+                <!-- Usuario (login) -->
+                <VBox spacing="4">
+                    <Label text="Nombre de usuario (login)" styleClass="label-campo"/>
+                    <TextField fx:id="txtUsuario" promptText="Ej: maria.garcia" maxWidth="Infinity"/>
+                </VBox>
+
+                <!-- Contraseña -->
+                <VBox spacing="4">
+                    <Label fx:id="lblContrasenaHint" text="Contraseña" styleClass="label-campo"/>
+                    <PasswordField fx:id="txtContrasena" promptText="Introduce la contraseña" maxWidth="Infinity"/>
+                    <Label fx:id="lblPassInfo"
+                           text="Dejar en blanco para no cambiarla"
+                           styleClass="subtitulo" visible="false" managed="false"/>
+                </VBox>
+
+                <!-- Rol -->
+                <VBox spacing="4">
+                    <Label text="Rol" styleClass="label-campo"/>
+                    <ComboBox fx:id="cmbRol" maxWidth="Infinity"/>
+                </VBox>
+
+                <!-- Estado (solo en edición) -->
+                <VBox fx:id="panelEstado" spacing="4" visible="false" managed="false">
+                    <Label text="Estado actual" styleClass="label-campo"/>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label fx:id="lblEstadoActual"
+                               style="-fx-font-size:13px; -fx-font-weight:bold;"/>
+                        <Button fx:id="btnToggleActivo"
+                                onAction="#onToggleActivo"
+                                styleClass="btn-secundario" prefHeight="32"/>
+                    </HBox>
+                </VBox>
+
+                <Label fx:id="lblMensaje" styleClass="label-error" wrapText="true"
+                       visible="false" managed="false"/>
+
+                <Separator/>
+
+                <VBox spacing="8">
+                    <Button fx:id="btnGuardar"
+                            text="Guardar"
+                            onAction="#onGuardar"
+                            styleClass="btn-primario" maxWidth="Infinity" prefHeight="40"/>
+                    <Button fx:id="btnEliminar"
+                            text="Eliminar camarero"
+                            onAction="#onEliminar"
+                            styleClass="btn-peligro" maxWidth="Infinity" prefHeight="38"
+                            visible="false" managed="false"/>
+                    <Button text="Cancelar"
+                            onAction="#onCancelar"
+                            styleClass="btn-secundario" maxWidth="Infinity" prefHeight="36"/>
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+
+    </StackPane>
+
+</SplitPane>

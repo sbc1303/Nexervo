@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<!--
+    Vista del cliente — FIX 2 (mismos colores que el resto) + FIX 3 (logo correcto)
+    + ADD sección "Mis Reservas" para buscar y cancelar
+-->
+<SplitPane dividerPositions="0.50" stylesheets="@/Estilo.css"
+           style="-fx-background-color: linear-gradient(to bottom right, #1A0A3C 0%, #162252 50%, #0F2D4A 100%);"
+           xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.nexervo.controlador.ClienteReservaControlador">
+
+    <!-- IZQUIERDA: Paneles alternantes -->
+    <ScrollPane fitToWidth="true" style="-fx-background-color:transparent;-fx-background:transparent;">
+        <StackPane fx:id="stackPaneles">
+
+            <!-- PANEL 1: Formulario -->
+            <VBox fx:id="panelFormulario" spacing="12" visible="true" managed="true">
+                <padding><Insets top="20" right="24" bottom="24" left="24"/></padding>
+
+                <!-- FIX 3: logo correcto en header -->
+                <HBox alignment="CENTER_LEFT" spacing="12">
+                    <ImageView fitWidth="110" fitHeight="60" preserveRatio="true">
+                        <image><Image url="@/img/logo_fondo_oscuro.png"/></image>
+                    </ImageView>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="Mis reservas" onAction="#onVerMisReservas"
+                            styleClass="btn-secundario" prefHeight="30"
+                            style="-fx-border-color:#00C6FF;-fx-text-fill:#00C6FF;"/>
+                    <Button text="← Volver" onAction="#onVolver"
+                            styleClass="btn-secundario" prefHeight="30"/>
+                </HBox>
+
+                <Label text="RESERVA TU MESA" styleClass="titulo-seccion"/>
+
+                <HBox spacing="12">
+                    <VBox spacing="4" HBox.hgrow="ALWAYS"><Label text="Nombre *"/>
+                        <TextField fx:id="txtNombre" promptText="Tu nombre" maxWidth="Infinity"/></VBox>
+                    <VBox spacing="4" HBox.hgrow="ALWAYS"><Label text="Apellidos *"/>
+                        <TextField fx:id="txtApellidos" promptText="Tus apellidos" maxWidth="Infinity"/></VBox>
+                </HBox>
+                <HBox spacing="12">
+                    <VBox spacing="4" HBox.hgrow="ALWAYS"><Label text="Teléfono *"/>
+                        <TextField fx:id="txtTelefono" promptText="600000000" maxWidth="Infinity"/></VBox>
+                    <VBox spacing="4" HBox.hgrow="ALWAYS"><Label text="Email"/>
+                        <TextField fx:id="txtEmail" promptText="correo@ejemplo.com" maxWidth="Infinity"/></VBox>
+                </HBox>
+                <HBox spacing="12">
+                    <VBox spacing="4" HBox.hgrow="ALWAYS"><Label text="Personas *"/>
+                        <Spinner fx:id="spinnerComensales" editable="true" maxWidth="Infinity"/></VBox>
+                    <VBox spacing="4" HBox.hgrow="ALWAYS"><Label text="Fecha *"/>
+                        <DatePicker fx:id="fechaReserva" maxWidth="Infinity"/></VBox>
+                </HBox>
+                <VBox spacing="4"><Label text="Turno y hora *"/>
+                    <ComboBox fx:id="comboHora" maxWidth="Infinity"
+                              promptText="Selecciona primero una fecha..."/></VBox>
+                <VBox spacing="4"><Label text="Mesa *"/>
+                    <TextField fx:id="txtMesaSeleccionada" editable="false"
+                               styleClass="campo-readonly"
+                               promptText="Selecciona una mesa del mapa →"/>
+                    <Label fx:id="lblInfoMesa" styleClass="label-info-mesa"/></VBox>
+                <!-- Alergias / Intolerancias — se precargan si el cliente ya existe -->
+                <VBox spacing="4">
+                    <Label text="Alergias / Intolerancias"/>
+                    <Label text="Si eres cliente habitual se cargarán automáticamente al introducir tu teléfono"
+                           styleClass="subtitulo" wrapText="true"/>
+                    <ListView fx:id="listaAlergiasForm" prefHeight="130"/>
+                    <Label fx:id="lblAlergiasForm" styleClass="label-alergias"
+                           text="Ninguna seleccionada" wrapText="true"/>
+                </VBox>
+
+                <VBox spacing="4"><Label text="Comentarios (opcional)"/>
+                    <TextArea fx:id="txtObservaciones" prefHeight="50" wrapText="true"
+                              promptText="Cumpleaños, preferencias especiales..."/></VBox>
+                <!-- Panel cliente habitual — visible solo si el teléfono ya existe en BD -->
+                <VBox fx:id="panelClienteHabitual" spacing="5"
+                      visible="false" managed="false"
+                      style="-fx-background-color:rgba(0,198,255,0.07);
+                             -fx-border-color:#00C6FF;
+                             -fx-border-radius:8;-fx-background-radius:8;
+                             -fx-border-width:1;-fx-padding:10 14 10 14;">
+                    <Label text="Cliente habitual"
+                           style="-fx-text-fill:#00C6FF;-fx-font-weight:bold;-fx-font-size:12px;"/>
+                    <Label fx:id="lblHistorialCliente"
+                           styleClass="subtitulo" wrapText="true"/>
+                </VBox>
+
+                <Label fx:id="lblEstadoMapa" styleClass="label-estado-mapa" wrapText="true"/>
+                <Button text="CONTINUAR AL PAGO →" onAction="#onConfirmar"
+                        styleClass="btn-primario" maxWidth="Infinity" prefHeight="44"/>
+                <Label text="Se realizará una preautorización de 10 € por persona como garantía."
+                       styleClass="label-pie" wrapText="true"/>
+            </VBox>
+
+            <!-- PANEL 2: Pago simulado -->
+            <VBox fx:id="panelPago" spacing="18" alignment="CENTER"
+                  visible="false" managed="false">
+                <padding><Insets top="40" right="40" bottom="40" left="40"/></padding>
+                <!-- FIX 3: logo correcto -->
+                <ImageView fitWidth="110" fitHeight="60" preserveRatio="true">
+                    <image><Image url="@/img/logo_fondo_oscuro.png"/></image>
+                </ImageView>
+                <Label text="CONFIRMA TU RESERVA Y PAGA" styleClass="titulo-seccion"/>
+                <VBox styleClass="panel-info" spacing="6">
+                    <padding><Insets top="14" right="18" bottom="14" left="18"/></padding>
+                    <Label fx:id="lblResumenPago" styleClass="label-valor" wrapText="true"/>
+                </VBox>
+                <VBox alignment="CENTER" spacing="4">
+                    <Label text="Preautorización" styleClass="label-campo"/>
+                    <Label fx:id="lblImportePago"
+                           style="-fx-font-size:34px;-fx-font-weight:bold;-fx-text-fill:#00C6FF;"/>
+                </VBox>
+                <VBox spacing="8">
+                    <Label text="Datos de pago (simulación)" styleClass="label-campo"/>
+                    <TextField promptText="1234 5678 9012 3456" maxWidth="Infinity"
+                               disable="true" style="-fx-opacity:0.55;"/>
+                    <HBox spacing="10">
+                        <TextField promptText="MM/AA" HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                                   disable="true" style="-fx-opacity:0.55;"/>
+                        <TextField promptText="CVV"   HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                                   disable="true" style="-fx-opacity:0.55;"/>
+                    </HBox>
+                </VBox>
+                <Label fx:id="lblProcesando" text="Procesando..."
+                       style="-fx-text-fill:#FFC107;-fx-font-weight:bold;" visible="false"/>
+                <Button fx:id="btnPagar" text="PAGAR Y CONFIRMAR"
+                        onAction="#onPagar"
+                        styleClass="btn-primario" maxWidth="Infinity" prefHeight="46"/>
+                <Button text="← Volver al formulario" onAction="#onVolver"
+                        styleClass="btn-secundario" maxWidth="Infinity"/>
+                <Label text="SIMULACIÓN · No se realizan cargos reales"
+                       styleClass="label-pie" alignment="CENTER"/>
+            </VBox>
+
+            <!-- PANEL 3: Confirmación -->
+            <VBox fx:id="panelConfirmacion" spacing="22" alignment="CENTER"
+                  visible="false" managed="false">
+                <padding><Insets top="60" right="40" bottom="40" left="40"/></padding>
+                <Label text="OK" style="-fx-font-size:52px;-fx-text-fill:#00E676;-fx-font-weight:bold;"/>
+                <Label fx:id="lblConfirmacion"
+                       style="-fx-font-size:22px;-fx-font-weight:bold;-fx-text-fill:#00E676;"/>
+                <VBox styleClass="panel-info" spacing="4">
+                    <padding><Insets top="14" right="18" bottom="14" left="18"/></padding>
+                    <Label fx:id="lblDetalleConfirmacion" styleClass="label-valor"
+                           wrapText="true" alignment="CENTER"/>
+                </VBox>
+                <Button text="Hacer otra reserva / Volver" onAction="#onVolver"
+                        styleClass="btn-primario" maxWidth="Infinity" prefHeight="42"/>
+            </VBox>
+
+            <!-- PANEL 4: Mis Reservas -->
+            <VBox fx:id="panelMisReservas" spacing="14" visible="false" managed="false">
+                <padding><Insets top="20" right="24" bottom="24" left="24"/></padding>
+
+                <HBox alignment="CENTER_LEFT" spacing="12">
+                    <ImageView fitWidth="110" fitHeight="60" preserveRatio="true">
+                        <image><Image url="@/img/logo_fondo_oscuro.png"/></image>
+                    </ImageView>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="← Volver" onAction="#onVolver"
+                            styleClass="btn-secundario" prefHeight="30"/>
+                </HBox>
+
+                <Label text="MIS RESERVAS" styleClass="titulo-seccion"/>
+                <Label text="Introduce tu teléfono y email de registro para acceder a tus reservas"
+                       styleClass="subtitulo" wrapText="true"/>
+
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <TextField fx:id="txtBuscarTel" promptText="Teléfono (ej: 600000000)"
+                               HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                    <TextField fx:id="txtBuscarEmail" promptText="Email de registro"
+                               HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                    <Button text="Buscar" onAction="#onBuscarMisReservas"
+                            styleClass="btn-secundario" prefHeight="34" prefWidth="80"/>
+                </HBox>
+
+                <TableView fx:id="tablaMisReservas" VBox.vgrow="ALWAYS" prefHeight="250">
+                    <columns>
+                        <TableColumn fx:id="colMRFecha"  text="Fecha"    prefWidth="90"/>
+                        <TableColumn fx:id="colMRHora"   text="Hora"     prefWidth="65"/>
+                        <TableColumn fx:id="colMRMesa"   text="Mesa"     prefWidth="60"/>
+                        <TableColumn fx:id="colMRPax"    text="Pax"      prefWidth="40"/>
+                        <TableColumn fx:id="colMREstado" text="Estado"   prefWidth="90"/>
+                    </columns>
+                    <placeholder>
+                        <Label text="Introduce tu teléfono y pulsa Buscar"
+                               styleClass="label-placeholder"/>
+                    </placeholder>
+                </TableView>
+
+                <HBox spacing="10">
+                    <Button fx:id="btnEditarMiReserva"
+                            text="Modificar reserva"
+                            onAction="#onEditarMiReserva"
+                            styleClass="btn-secundario" HBox.hgrow="ALWAYS" maxWidth="Infinity" prefHeight="40"
+                            disable="true"/>
+                    <Button fx:id="btnCancelarMiReserva"
+                            text="Cancelar reserva"
+                            onAction="#onCancelarMiReserva"
+                            styleClass="btn-peligro" HBox.hgrow="ALWAYS" maxWidth="Infinity" prefHeight="40"
+                            disable="true"/>
+                </HBox>
+
+                <Label text="Solo puedes modificar o cancelar reservas con estado CONFIRMADA."
+                       styleClass="label-pie" wrapText="true"/>
+            </VBox>
+
+            <!-- PANEL 5: Editar Reserva -->
+            <VBox fx:id="panelEditarReserva" spacing="12" visible="false" managed="false">
+                <padding><Insets top="20" right="24" bottom="24" left="24"/></padding>
+
+                <HBox alignment="CENTER_LEFT" spacing="12">
+                    <ImageView fitWidth="110" fitHeight="60" preserveRatio="true">
+                        <image><Image url="@/img/logo_fondo_oscuro.png"/></image>
+                    </ImageView>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="← Volver" onAction="#onVolverAMisReservas"
+                            styleClass="btn-secundario" prefHeight="30"/>
+                </HBox>
+
+                <Label text="MODIFICAR RESERVA" styleClass="titulo-seccion"/>
+                <Label fx:id="lblInfoReservaEditar" styleClass="subtitulo" wrapText="true"/>
+
+                <HBox spacing="12">
+                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                        <Label text="Comensales"/>
+                        <Spinner fx:id="spinnerEditComensales" editable="true" maxWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                        <Label text="Mesa (elige en el mapa →)"/>
+                        <TextField fx:id="txtEditMesa" editable="false" styleClass="campo-readonly"
+                                   maxWidth="Infinity" promptText="Selecciona del mapa →"/>
+                    </VBox>
+                </HBox>
+
+                <VBox spacing="4">
+                    <Label text="Observaciones"/>
+                    <TextArea fx:id="txtEditObservaciones" prefHeight="60" wrapText="true"
+                              promptText="Preferencias, cumpleaños, peticiones especiales..."/>
+                </VBox>
+
+                <VBox spacing="6">
+                    <Label text="Alergias / Intolerancias" styleClass="label-campo"/>
+                    <Label text="Marca las que correspondan (se guardan en tu perfil)" styleClass="subtitulo"/>
+                    <ScrollPane fitToWidth="true" prefHeight="160"
+                                style="-fx-background-color:transparent;-fx-background:transparent;">
+                        <VBox fx:id="vboxAlergiasEditar" spacing="5">
+                            <padding><Insets top="4" right="8" bottom="4" left="8"/></padding>
+                        </VBox>
+                    </ScrollPane>
+                </VBox>
+
+                <Button text="GUARDAR CAMBIOS" onAction="#onGuardarCambiosReserva"
+                        styleClass="btn-primario" maxWidth="Infinity" prefHeight="44"/>
+                <Label fx:id="lblEstadoEdicion" styleClass="label-pie" wrapText="true"/>
+            </VBox>
+
+        </StackPane>
+    </ScrollPane>
+
+    <!-- DERECHA: Mapa -->
+    <VBox spacing="12">
+        <padding><Insets top="24" right="24" bottom="24" left="20"/></padding>
+        <Label text="DISPONIBILIDAD" styleClass="titulo-seccion"/>
+        <Label text="Selecciona fecha y hora para ver las mesas disponibles"
+               styleClass="subtitulo" wrapText="true"/>
+        <HBox spacing="20" alignment="CENTER_LEFT">
+            <Label text="● LIBRE"   styleClass="leyenda-libre"/>
+            <Label text="● OCUPADA" styleClass="leyenda-ocupada"/>
+            <Label text="● ELEGIDA" styleClass="leyenda-elegida"/>
+        </HBox>
+        <FlowPane fx:id="flowMapa" hgap="10" vgap="10"
+                  visible="false" VBox.vgrow="ALWAYS"/>
+    </VBox>
+
+</SplitPane>

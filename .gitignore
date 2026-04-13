@@ -1,0 +1,25 @@
+# Maven
+target/
+*.class
+*.jar
+*.war
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Logs
+logs/
+*.log
+
+# macOS
+.DS_Store
+
+# Credenciales — nunca subir al repo
+src/main/resources/config.properties
+
+# Generado por maven-shade-plugin
+dependency-reduced-pom.xml

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXERVO · Panel de Sala</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #1a1a2e;
+            color: #e8e8e8;
+            min-height: 100vh;
+        }
+
+        header {
+            background: #16213e;
+            border-bottom: 2px solid #e94560;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        header h1 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #e94560;
+            letter-spacing: 2px;
+        }
+
+        header .subtitulo {
+            font-size: 0.72rem;
+            color: #a0a0b8;
+        }
+
+        #hora { font-size: 1.1rem; color: #a0a0b8; font-weight: 600; }
+
+        /* KPIs */
+        .kpis {
+            display: flex;
+            gap: 12px;
+            padding: 18px 18px 0;
+            flex-wrap: wrap;
+        }
+
+        .kpi {
+            background: #16213e;
+            border: 1px solid #2d2d4e;
+            border-radius: 8px;
+            padding: 14px 20px;
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .kpi .n { font-size: 2rem; font-weight: 700; color: #e94560; }
+        .kpi .l { font-size: 0.72rem; color: #a0a0b8; margin-top: 4px; text-transform: uppercase; }
+
+        /* Barra de filtros */
+        .filtros {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 18px 10px;
+            flex-wrap: wrap;
+        }
+
+        .filtros label { font-size: 0.82rem; color: #a0a0b8; }
+
+        .filtros input[type="date"] {
+            background: #0f3460;
+            border: 1px solid #2d2d4e;
+            border-radius: 6px;
+            color: #e8e8e8;
+            padding: 7px 12px;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            background: #e94560;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 7px 16px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-gris { background: #2d2d4e; }
+        #total-txt { font-size: 0.82rem; color: #a0a0b8; margin-left: auto; }
+
+        /* Separador */
+        .sep {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            color: #a0a0b8;
+            letter-spacing: 1px;
+            padding: 14px 18px 8px;
+            border-bottom: 1px solid #2d2d4e;
+            margin: 0 18px 10px;
+        }
+
+        /* Tarjetas de reserva */
+        .lista { padding: 0 18px 40px; display: flex; flex-direction: column; gap: 10px; }
+
+        .card {
+            background: #16213e;
+            border: 1px solid #2d2d4e;
+            border-left: 4px solid #27ae60;
+            border-radius: 8px;
+            padding: 14px;
+            display: grid;
+            grid-template-columns: 65px 1fr auto;
+            gap: 0 14px;
+        }
+
+        .card.CANCELADA      { border-left-color: #c0392b; }
+        .card.FINALIZADA     { border-left-color: #2980b9; }
+        .card.No_presentado  { border-left-color: #e67e22; }
+
+        .hora-bloque { text-align: center; }
+        .hora-bloque .hora { font-size: 1.25rem; font-weight: 700; }
+        .hora-bloque .mesa { font-size: 0.78rem; color: #a0a0b8; margin-top: 2px; }
+
+        .datos .nombre { font-weight: 700; }
+        .datos .info   { font-size: 0.8rem; color: #a0a0b8; margin-top: 3px; }
+
+        .datos .tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
+        .tag {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .tag-oc { background: #4a1a7a; color: #d8a8ff; }
+        .tag-pt { background: #1a4a2a; color: #aaffcc; }
+
+        .badge {
+            display: inline-block;
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-top: 6px;
+            text-transform: uppercase;
+        }
+        .b-CONFIRMADA  { background: #0d3b20; color: #4caf50; }
+        .b-CANCELADA   { background: #3b0d0d; color: #ef5350; }
+        .b-FINALIZADA  { background: #0d1f3b; color: #42a5f5; }
+        .b-No_presentado { background: #3b1f0d; color: #ffa726; }
+
+        .acciones { display: flex; flex-direction: column; gap: 5px; min-width: 100px; }
+
+        .btn-acc {
+            background: transparent;
+            border: 1px solid #2d2d4e;
+            color: #a0a0b8;
+            border-radius: 6px;
+            padding: 5px 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+        .btn-acc:hover { background: #0f3460; color: #e8e8e8; }
+
+        .aviso {
+            text-align: center;
+            color: #a0a0b8;
+            padding: 50px 20px;
+        }
+
+        /* Responsive móvil */
+        @media (max-width: 480px) {
+            .card { grid-template-columns: 1fr; }
+            .acciones { flex-direction: row; flex-wrap: wrap; }
+        }
+
+        /* Toast */
+        #toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0f3460;
+            color: #e8e8e8;
+            padding: 10px 22px;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        #toast.vis { opacity: 1; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div>
+        <h1>NEXERVO</h1>
+        <div class="subtitulo">Panel de sala · Web</div>
+    </div>
+    <div id="hora">--:--</div>
+</header>
+
+<div class="kpis">
+    <div class="kpi"><div class="n" id="k-hoy">–</div><div class="l">Hoy</div></div>
+    <div class="kpi"><div class="n" id="k-mes">–</div><div class="l">Este mes</div></div>
+    <div class="kpi"><div class="n" id="k-cli">–</div><div class="l">Clientes</div></div>
+    <div class="kpi"><div class="n" id="k-aus">–</div><div class="l">No-shows</div></div>
+</div>
+
+<div class="filtros">
+    <label for="fecha">Fecha</label>
+    <input type="date" id="fecha">
+    <button class="btn" onclick="cargar()">Ver</button>
+    <button class="btn btn-gris" onclick="ponerHoy()">Hoy</button>
+    <span id="total-txt"></span>
+</div>
+
+<div class="sep">Reservas del día</div>
+<div class="lista" id="lista"></div>
+
+<div id="toast"></div>
+
+<script>
+    // window.location.origin devuelve el protocolo + host + puerto del propio servidor
+    // — así funciona tanto desde el mismo PC (localhost:7070) como desde una tablet
+    // en la red del local (192.168.1.X:7070) sin tocar nada
+    const BASE = window.location.origin;
+
+    // Reloj
+    function tick() {
+        const d = new Date();
+        document.getElementById('hora').textContent =
+            d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    }
+    tick();
+    setInterval(tick, 30000);
+
+    // Fecha
+    function hoy() { return new Date().toISOString().split('T')[0]; }
+    function ponerHoy() {
+        document.getElementById('fecha').value = hoy();
+        cargar();
+    }
+    document.getElementById('fecha').value = hoy();
+    document.getElementById('fecha').addEventListener('change', cargar);
+
+    // KPIs
+    async function cargarKpis() {
+        try {
+            const r = await fetch(BASE + '/api/dashboard');
+            if (!r.ok) return;
+            const d = await r.json();
+            document.getElementById('k-hoy').textContent = d.reservasHoy  ?? '–';
+            document.getElementById('k-mes').textContent = d.reservasMes  ?? '–';
+            document.getElementById('k-cli').textContent = d.totalClientes ?? '–';
+            document.getElementById('k-aus').textContent = d.ausenciasMes ?? '–';
+        } catch (_) { /* si no hay conexión los KPIs quedan en – */ }
+    }
+
+    // Reservas del día
+    async function cargar() {
+        const fecha = document.getElementById('fecha').value || hoy();
+        const lista = document.getElementById('lista');
+        lista.innerHTML = '<div class="aviso">Cargando…</div>';
+
+        try {
+            const r = await fetch(BASE + '/api/reservas?fecha=' + fecha);
+            if (!r.ok) throw new Error();
+            const datos = await r.json();
+
+            const n = datos.length;
+            document.getElementById('total-txt').textContent =
+                n === 0 ? 'Sin reservas' : n === 1 ? '1 reserva' : n + ' reservas';
+
+            if (n === 0) {
+                lista.innerHTML = '<div class="aviso">No hay reservas para este día.</div>';
+                return;
+            }
+
+            lista.innerHTML = datos.map(r => tarjeta(r)).join('');
+
+        } catch (_) {
+            lista.innerHTML = `<div class="aviso">
+                No se puede conectar con NEXERVO.<br>
+                <small style="margin-top:6px;display:block;">
+                    Comprueba que la app de escritorio esté abierta y MySQL activo.
+                </small>
+            </div>`;
+            document.getElementById('total-txt').textContent = '';
+        }
+    }
+
+    function tarjeta(r) {
+        const est = (r.estadoReserva || '').replace(/\s/g, '_');
+        const hora = (r.horaReserva || '--:--').substring(0, 5);
+
+        let tags = '';
+        if (r.ocasion && r.ocasion !== 'Ninguna')
+            tags += `<span class="tag tag-oc">🎉 ${r.ocasion}</span>`;
+        if (r.peticionesEspeciales)
+            tags += `<span class="tag tag-pt">📝 ${r.peticionesEspeciales}</span>`;
+
+        const bots = r.estadoReserva === 'CONFIRMADA' ? `
+            <button class="btn-acc" onclick="cambiar(${r.idReserva},'FINALIZADA')">✓ Finalizar</button>
+            <button class="btn-acc" onclick="cambiar(${r.idReserva},'CANCELADA')">✗ Cancelar</button>
+            <button class="btn-acc" onclick="cambiar(${r.idReserva},'No presentado')">⚠ No-show</button>
+        ` : '';
+
+        return `
+        <div class="card ${est}" id="c${r.idReserva}">
+            <div class="hora-bloque">
+                <div class="hora">${hora}</div>
+                <div class="mesa">${r.numeroMesa || ''}</div>
+            </div>
+            <div class="datos">
+                <div class="nombre">${r.nombreCliente || '–'}</div>
+                <div class="info">${r.comensales} pax${r.observaciones ? ' · ' + r.observaciones : ''}</div>
+                <div class="tags">${tags}</div>
+                <span class="badge b-${est}">${r.estadoReserva || est}</span>
+            </div>
+            <div class="acciones">${bots}</div>
+        </div>`;
+    }
+
+    async function cambiar(id, estado) {
+        try {
+            const url = `${BASE}/api/reservas/${id}/estado?estado=${encodeURIComponent(estado)}`;
+            const r = await fetch(url, { method: 'PATCH' });
+            const d = await r.json();
+            if (d.ok) {
+                toast('Estado actualizado ✓');
+                setTimeout(cargar, 500);
+            } else {
+                toast('No se pudo actualizar.');
+            }
+        } catch (_) {
+            toast('Error de conexión.');
+        }
+    }
+
+    function toast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('vis');
+        setTimeout(() => t.classList.remove('vis'), 2800);
+    }
+
+    // Recarga automática cada minuto
+    setInterval(cargar, 60000);
+
+    cargarKpis();
+    cargar();
+</script>
+</body>
+</html>
